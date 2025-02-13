@@ -1,7 +1,5 @@
 import pygame
-import random
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
-from enemies.enemies import spawnenemy, enemy_present, enemy_x, enemy_y, enemy_sprite
 
 # Initialize pygame
 pygame.init()
@@ -12,7 +10,6 @@ GRID_SIZE = 15  # 15x15 map
 WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE, TILE_SIZE * GRID_SIZE
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-SPAWN_INTERVAL = 60  # Frames per spawn attempt
 
 # Set up display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -29,8 +26,6 @@ world_map[3][3] = "rock"
 world_map[5][6] = "rock"
 world_map[7][7] = "rock"
 world_map[10][10] = "rock"
-world_map[12][14] = "hills"
-world_map[14][14] = "hills"
 
 # Player starting position (grid-based)
 player_x, player_y = 0, 0
@@ -38,10 +33,9 @@ player_x, player_y = 0, 0
 # Game loop
 running = True
 redraw_needed = True  # Only redraw when necessary
-frame_counter = 0  # Track frames for enemy spawning
 
 while running:
-    clock.tick(60)  # Limit FPS to 60
+    clock.tick(60)  # Limit FPS to 60 (prevents CPU overuse)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -65,15 +59,7 @@ while running:
                 player_x, player_y = new_x, new_y
                 redraw_needed = True
 
-    # Spawn enemy every 60 frames
-    frame_counter += 1
-    if frame_counter >= SPAWN_INTERVAL:
-        enemy_spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
-        if enemy_spawn_result:
-            enemy_x, enemy_y, enemy_sprite = enemy_spawn_result
-        frame_counter = 0
-
-    # Only redraw if necessary
+    # Only redraw if movement occurred
     if redraw_needed:
         screen.fill(BLACK)
 
@@ -88,11 +74,6 @@ while running:
         font = pygame.font.Font(None, 50)
         text = font.render("A", True, WHITE)
         screen.blit(text, (player_x * TILE_SIZE + 15, player_y * TILE_SIZE + 5))
-
-        # Draw enemy if present
-        if enemy_present:
-            text = font.render(enemy_sprite, True, WHITE)
-            screen.blit(text, (enemy_x * TILE_SIZE + 15, enemy_y * TILE_SIZE + 5))
 
         pygame.display.update()
         redraw_needed = False  # Prevent unnecessary redraws

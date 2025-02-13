@@ -8,5 +8,6 @@ class Tile:
 # Dictionary to store tile types
 TILE_TYPES = {
     "grassland": Tile((34, 139, 34), True),  # Forest Green, passable
-    "rock": Tile((128, 128, 128), False)  # Grey, impassable
+    "rock": Tile((128, 128, 128), False),  # Grey, impassable
+    "hills": Tile((255,165,0), True)
 }
