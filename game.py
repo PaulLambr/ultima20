@@ -1,7 +1,8 @@
 import pygame
 import random
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
-from enemies.enemies import spawnenemy, enemy_present, enemy_x, enemy_y, enemy_sprite
+from enemies.enemies import spawnenemy, moveenemy
+from battle import combat
 
 # Initialize pygame
 pygame.init()
@@ -20,9 +21,7 @@ pygame.display.set_caption("Move 'A' on a 15x15 Tile Map")
 clock = pygame.time.Clock()  # Controls frame rate
 
 # Sample 15x15 map using tile type keys
-world_map = [
-    ["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)
-]
+world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 
 # Add some rocks manually for testing (impassable areas)
 world_map[3][3] = "rock"
@@ -31,9 +30,17 @@ world_map[7][7] = "rock"
 world_map[10][10] = "rock"
 world_map[12][14] = "hills"
 world_map[14][14] = "hills"
+world_map[13][14] = "hills"
+world_map[11][14] = "hills"
+world_map[10][14] = "hills"
 
-# Player starting position (grid-based)
+# Player starting position
 player_x, player_y = 0, 0
+player_level = 2
+
+# Enemy tracking variables (initialized as None)
+enemy_present = False
+enemy_x, enemy_y, enemy_sprite = None, None, None
 
 # Game loop
 running = True
@@ -65,12 +72,21 @@ while running:
                 player_x, player_y = new_x, new_y
                 redraw_needed = True
 
+                # Move the enemy towards the player
+                if enemy_present:
+                    enemy_x, enemy_y = moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES)
+
+                    if enemy_x==player_x and enemy_y==player_y:
+                        combat(player_level)
+    
+
     # Spawn enemy every 60 frames
     frame_counter += 1
-    if frame_counter >= SPAWN_INTERVAL:
-        enemy_spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
-        if enemy_spawn_result:
-            enemy_x, enemy_y, enemy_sprite = enemy_spawn_result
+    if frame_counter >= SPAWN_INTERVAL and not enemy_present:
+        spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
+        if spawn_result:
+            enemy_x, enemy_y, enemy_sprite = spawn_result
+            enemy_present = True  # Enemy is now on the map
         frame_counter = 0
 
     # Only redraw if necessary
@@ -90,7 +106,7 @@ while running:
         screen.blit(text, (player_x * TILE_SIZE + 15, player_y * TILE_SIZE + 5))
 
         # Draw enemy if present
-        if enemy_present:
+        if enemy_present and enemy_sprite:
             text = font.render(enemy_sprite, True, WHITE)
             screen.blit(text, (enemy_x * TILE_SIZE + 15, enemy_y * TILE_SIZE + 5))
 

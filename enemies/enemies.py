@@ -1,32 +1,23 @@
 import random
 
-# Enemy properties
-enemy_present = False
-enemy_x, enemy_y = None, None
-enemy_sprite = None
-
 # Enemy class
 class Enemies:
-    def __init__(self, hitpoints, strength, loot, spawn, lettersprite):
+    def __init__(self, hitpoints, strength, loot, spawn, lettersprite, xp):
         self.hitpoints = hitpoints  
         self.strength = strength
         self.loot = loot
         self.spawn = spawn
         self.lettersprite = lettersprite
+        self.xp = xp
 
 # Dictionary to store enemy types
 ENEMIES_LIST = {
-    "orc": Enemies(25, 10, 10, "grassland", "O"),  
-    "troll": Enemies(35, 20, 15, "hills", "T")  
+    "orc": Enemies(25, 10, 10, "grassland", "O",20),  
+    "troll": Enemies(35, 20, 15, "hills", "T",30)  
 }
 
 # Function to spawn an enemy
 def spawnenemy(world_map, GRID_SIZE):
-    global enemy_present, enemy_x, enemy_y, enemy_sprite
-
-    if enemy_present:
-        return None  # Don't spawn if an enemy is already on the map
-
     spawnable_tiles = []  # List to store potential spawn locations
 
     # Find all grassland and hill tiles
@@ -49,6 +40,40 @@ def spawnenemy(world_map, GRID_SIZE):
         enemy_type = "troll"
 
     enemy_sprite = ENEMIES_LIST[enemy_type].lettersprite
-    enemy_present = True  # Mark that an enemy exists
 
-    return enemy_x, enemy_y, enemy_sprite  # Return enemy info
+    return enemy_x, enemy_y, enemy_sprite  # Return enemy info instead of modifying global vars
+
+# Function to move enemy toward player
+def moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES):
+    """
+    Moves the enemy one step toward the player, but only in one direction (X or Y).
+    Returns the new (enemy_x, enemy_y).
+    """
+
+    # Calculate possible movement directions
+    move_x = 0
+    move_y = 0
+
+    if enemy_x < player_x:  # Move right
+        move_x = 1
+    elif enemy_x > player_x:  # Move left
+        move_x = -1
+
+    if enemy_y < player_y:  # Move down
+        move_y = 1
+    elif enemy_y > player_y:  # Move up
+        move_y = -1
+
+    # Randomly decide whether to move in X or Y direction (not both)
+    if random.choice([True, False]):  # 50% chance to prioritize horizontal movement
+        new_x = enemy_x + move_x
+        new_y = enemy_y  # Keep Y the same
+    else:  # 50% chance to prioritize vertical movement
+        new_x = enemy_x
+        new_y = enemy_y + move_y  # Keep X the same
+
+    # Check if new position is passable
+    if TILE_TYPES[world_map[new_y][new_x]].passable:
+        return new_x, new_y  # Move enemy to new position
+
+    return enemy_x, enemy_y  # Stay in place if blocked
