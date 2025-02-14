@@ -3,14 +3,20 @@ import random
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
 from enemies.enemies import spawnenemy, moveenemy
 from battle import combat  # Import combat system
+from ui import UI
+from playerstats import PlayerStats  # Import player stats
 
 # Initialize pygame
 pygame.init()
 
+# Create the Player
+player = PlayerStats(hitpoints=20, strength=5, gold=10, xp=0, weapon="Fists", armor="None")
+ui_panel = UI(player)  # Initialize UI panel
+
 # Constants
 TILE_SIZE = 50
 GRID_SIZE = 15  # 15x15 map
-WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE, TILE_SIZE * GRID_SIZE
+WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + ui_panel.WIDTH, TILE_SIZE * GRID_SIZE  # Account for UI width
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 SPAWN_INTERVAL = 60  # Frames per spawn attempt
@@ -37,7 +43,7 @@ world_map[10][14] = "hills"
 # Player starting position
 player_x, player_y = 0, 0
 player_level = 2
-restore_x, restore_y = None
+restore_x, restore_y = player_x, player_y  # Ensure it's initialized
 
 # Enemy tracking variables (initialized as None)
 enemy_present = False
@@ -52,7 +58,7 @@ def returntomap():
     """
     Restores the player's position after combat.
     """
-    global player_x, player_y
+    global player_x, player_y, restore_x, restore_y
     player_x, player_y = restore_x, restore_y  # Restore previous position
 
 while running:
@@ -81,7 +87,7 @@ while running:
                 redraw_needed = True
 
                 # Move the enemy towards the player
-                if enemy_present:
+                if enemy_present and enemy_x is not None and enemy_y is not None:
                     enemy_x, enemy_y = moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES)
 
                     # If player and enemy collide, initiate combat
@@ -120,6 +126,9 @@ while running:
         if enemy_present and enemy_sprite:
             text = font.render(enemy_sprite, True, WHITE)
             screen.blit(text, (enemy_x * TILE_SIZE + 15, enemy_y * TILE_SIZE + 5))
+
+        # Draw UI Panel (Stats)
+        ui_panel.draw(screen)
 
         pygame.display.update()
         redraw_needed = False  # Prevent unnecessary redraws
