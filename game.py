@@ -2,7 +2,7 @@ import pygame
 import random
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
 from enemies.enemies import spawnenemy, moveenemy
-from battle import combat
+from battle import combat  # Import combat system
 
 # Initialize pygame
 pygame.init()
@@ -37,6 +37,7 @@ world_map[10][14] = "hills"
 # Player starting position
 player_x, player_y = 0, 0
 player_level = 2
+restore_x, restore_y = None
 
 # Enemy tracking variables (initialized as None)
 enemy_present = False
@@ -46,6 +47,13 @@ enemy_x, enemy_y, enemy_sprite = None, None, None
 running = True
 redraw_needed = True  # Only redraw when necessary
 frame_counter = 0  # Track frames for enemy spawning
+
+def returntomap():
+    """
+    Restores the player's position after combat.
+    """
+    global player_x, player_y
+    player_x, player_y = restore_x, restore_y  # Restore previous position
 
 while running:
     clock.tick(60)  # Limit FPS to 60
@@ -76,9 +84,12 @@ while running:
                 if enemy_present:
                     enemy_x, enemy_y = moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES)
 
-                    if enemy_x==player_x and enemy_y==player_y:
-                        combat(player_level)
-    
+                    # If player and enemy collide, initiate combat
+                    if enemy_x == player_x and enemy_y == player_y:
+                        restore_x, restore_y = player_x, player_y  # Save position
+                        combat(player_level)  # Start battle
+                        returntomap()  # Restore position after battle
+                        enemy_present = False  # Enemy defeated, remove from overworld
 
     # Spawn enemy every 60 frames
     frame_counter += 1
