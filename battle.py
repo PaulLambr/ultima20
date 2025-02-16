@@ -1,8 +1,10 @@
 import pygame
 import random
-from enemies.enemies import ENEMIES_LIST, moveenemy  
+from enemies.enemies import ENEMIES_LIST
 from tiletypes.tiletypes import TILE_TYPES
-from game import returntomap  # Import function to return to map
+from utils import returntomap
+from ui import UI
+from gamestate import player, ui_panel, PlayerStats
 
 # Constants for Battle Screen
 BATTLE_GRID_SIZE = 12  
@@ -12,24 +14,28 @@ BLACK = (0, 0, 0)
 
 # Flags for attack mode
 attack_mode = False
-pending_attack = None  
+pending_attack = None 
+player_x, player_y = 0, 0
+restore_x, restore_y = player_x, player_y
+ 
 
-def combat(player_level):
+def combat(player_level, tile_type, enemy_type):
     global attack_mode, pending_attack
-    
-    pygame.init()
-    WIDTH, HEIGHT = TILE_SIZE * BATTLE_GRID_SIZE, TILE_SIZE * BATTLE_GRID_SIZE
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Battle Mode")
 
-    # Generate blank battle grid (All 'grassland' tiles)
-    battle_map = [["grassland"] * BATTLE_GRID_SIZE for _ in range(BATTLE_GRID_SIZE)]
+    pygame.init()
+    WIDTH, HEIGHT = TILE_SIZE * BATTLE_GRID_SIZE + ui_panel.WIDTH, TILE_SIZE * BATTLE_GRID_SIZE
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Fight for Glory!")
+
+    # Generate battle grid using the tile type from where battle started
+    print(f"\ncombat 1 = {tile_type}")
+    battle_map = [[tile_type] * BATTLE_GRID_SIZE for _ in range(BATTLE_GRID_SIZE)]
 
     # Player starts in the center
     player_x, player_y = 6, 10
 
     # Determine the number of enemies based on player level
-    num_enemies = min(player_level, 5)  
+    num_enemies = min(player_level, 5)
     enemy_list = []
 
     for _ in range(num_enemies):
@@ -37,10 +43,10 @@ def combat(player_level):
             enemy_x = random.randint(0, BATTLE_GRID_SIZE - 1)
             enemy_y = random.randint(0, BATTLE_GRID_SIZE - 1)
 
-            if (enemy_x, enemy_y) != (player_x, player_y) and (enemy_x, enemy_y) not in [(ex, ey) for ex, ey, _, _, _ in enemy_list]:
-                enemy_type = random.choice(list(ENEMIES_LIST.keys()))  
+            # Ensure enemies do not start at the player's position
+            if (enemy_x, enemy_y) != (player_x, player_y) and (enemy_x, enemy_y) not in [(ex, ey) for ex, ey, _, _, _ in enemy_list]: 
                 enemy_sprite = ENEMIES_LIST[enemy_type].lettersprite
-                enemy_health = ENEMIES_LIST[enemy_type].hitpoints  # Store unique health per enemy
+                enemy_health = ENEMIES_LIST[enemy_type].hitpoints
                 enemy_list.append([enemy_x, enemy_y, enemy_type, enemy_sprite, enemy_health])
                 break
 
@@ -48,7 +54,7 @@ def combat(player_level):
     clock = pygame.time.Clock()
 
     while running:
-        clock.tick(60)  
+        clock.tick(60)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -64,7 +70,24 @@ def combat(player_level):
                     pending_attack = event.key  
                     attack_mode = False  
                     attack(player_x, player_y, pending_attack, enemy_list)
-                
+
+                    # ✅ Trigger adjacency check after an attack
+                    new_enemy_list = []
+                    for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
+                        if (abs(ex - player_x) == 1 and ey == player_y) or (abs(ey - player_y) == 1 and ex == player_x):
+                            print(f"Enemy at ({ex}, {ey}) attacks!")
+                            enemy_attack(enemy_list, i, player_x, player_y)  # ✅ Pass player_x and player_y
+                            new_enemy_list.append([ex, ey, et, es, hp])  # Enemy stays in place
+                        else:
+                            # ✅ Enemy moves if not adjacent
+                            new_ex, new_ey = move_enemy_battle(ex, ey, player_x, player_y, battle_map, TILE_TYPES, enemy_list)
+                            if (new_ex, new_ey) != (player_x, player_y):  
+                                new_enemy_list.append([new_ex, new_ey, et, es, hp])
+                            else:
+                                new_enemy_list.append([ex, ey, et, es, hp])  # Stay in place if blocked
+
+                    enemy_list = new_enemy_list  # ✅ Update enemy positions after an attack
+
                 else:  # Player movement
                     new_x, new_y = player_x, player_y
                     if event.key == pygame.K_LEFT and player_x > 0:
@@ -76,20 +99,36 @@ def combat(player_level):
                     if event.key == pygame.K_DOWN and player_y < BATTLE_GRID_SIZE - 1:
                         new_y += 1
 
-                    player_x, player_y = new_x, new_y  
+                    # ✅ Prevent player from moving onto an enemy's position
+                    if (new_x, new_y) not in [(ex, ey) for ex, ey, _, _, _ in enemy_list]:
+                        player_x, player_y = new_x, new_y  # Move player
 
-                    # Move enemies
+                    # After player moves, each enemy takes its turn
                     new_enemy_list = []
-                    for ex, ey, et, es, hp in enemy_list:
-                        new_ex, new_ey = moveenemy(ex, ey, player_x, player_y, battle_map, TILE_TYPES)
-                        new_enemy_list.append([new_ex, new_ey, et, es, hp])
-                    enemy_list = new_enemy_list  
+                    for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
+                        # ✅ Check if enemy is adjacent (not diagonal)
+                        if (abs(ex - player_x) == 1 and ey == player_y) or (abs(ey - player_y) == 1 and ex == player_x):
+                            print(f"Enemy at ({ex}, {ey}) attacks!")
+                            enemy_attack(enemy_list, i, player_x, player_y)  # ✅ Pass player_x and player_y
+                            new_enemy_list.append([ex, ey, et, es, hp])  # Enemy stays in place
+                        else:
+                            # ✅ Enemy moves if not adjacent
+                            new_ex, new_ey = move_enemy_battle(ex, ey, player_x, player_y, battle_map, TILE_TYPES, enemy_list)
+                            if (new_ex, new_ey) != (player_x, player_y):  
+                                new_enemy_list.append([new_ex, new_ey, et, es, hp])
+                            else:
+                                new_enemy_list.append([ex, ey, et, es, hp])  # Stay in place if blocked
+
+                    enemy_list = new_enemy_list  # ✅ Update enemy positions
 
         # Draw the screen
         screen.fill(BLACK)
 
+        ui_panel.draw(screen) 
+
         for row in range(BATTLE_GRID_SIZE):
             for col in range(BATTLE_GRID_SIZE):
+                #print(f"\ncombat 2 = {tile_type}")
                 tile_type = battle_map[row][col]
                 tile = TILE_TYPES[tile_type]
                 pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
@@ -107,10 +146,59 @@ def combat(player_level):
         # If all enemies are dead, return to world map
         if not enemy_list:
             pygame.time.delay(500)  # Small delay before returning
-            returntomap()
+            returntomap(player_x, player_y, restore_x, restore_y)
             break  # Exit the battle
 
-    pygame.quit()
+    return
+
+def enemy_attack(enemy_list, enemy_index, player_x, player_y):
+    """
+    Enemy attacks the player if adjacent (not diagonal).
+    """
+    enemy_x, enemy_y = enemy_list[enemy_index][0], enemy_list[enemy_index][1]
+
+    # ✅ Ensure enemy attacks if adjacent
+    if (abs(enemy_x - player_x) == 1 and enemy_y == player_y) or (abs(enemy_y - player_y) == 1 and enemy_x == player_x):
+        enemy_damage = random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength
+        player.hitpoints -= enemy_damage
+        print(f"\nThe enemy dealt {enemy_damage:.2f} damage! Player HP: {player.hitpoints}")
+
+        # Check if player is dead
+        if player.hitpoints <= 0:
+            print("\nYou have been defeated! Game Over.")
+            pygame.quit()
+            exit()  # Exit the game
+
+
+def move_enemy_battle(enemy_x, enemy_y, player_x, player_y, battle_map, TILE_TYPES, enemy_list):
+    """
+    Moves the enemy one step toward the player in either X or Y direction (not both).
+    Returns the new (enemy_x, enemy_y).
+    """
+
+    # If enemy is adjacent to the player, it does not move (attacks instead)
+    if (abs(enemy_x - player_x) == 1 and enemy_y == player_y) or (abs(enemy_y - player_y) == 1 and enemy_x == player_x):
+        return enemy_x, enemy_y  # Stay in place if adjacent
+
+    # Determine possible movement directions
+    possible_moves = []
+    if enemy_x < player_x:  # Move right
+        possible_moves.append((enemy_x + 1, enemy_y))
+    elif enemy_x > player_x:  # Move left
+        possible_moves.append((enemy_x - 1, enemy_y))
+
+    if enemy_y < player_y:  # Move down
+        possible_moves.append((enemy_x, enemy_y + 1))
+    elif enemy_y > player_y:  # Move up
+        possible_moves.append((enemy_x, enemy_y - 1))
+
+    random.shuffle(possible_moves)  # Shuffle movement options
+
+    for new_x, new_y in possible_moves:
+        if TILE_TYPES[battle_map[new_y][new_x]].passable and (new_x, new_y) not in [(ex, ey) for ex, ey, _, _, _ in enemy_list]:
+            return new_x, new_y  # Move enemy to new position
+
+    return enemy_x, enemy_y  # Stay in place if blocked
 
 def attack(player_x, player_y, direction, enemy_list):
     """
@@ -136,13 +224,17 @@ def damage(enemy_index, enemy_list):
     """
     Reduces enemy hitpoints and removes the enemy if they are defeated.
     """
-    enemy_list[enemy_index][4] -= 10  # Reduce enemy's health by 10
+    enemy_damage = random.uniform(1,2) * player.strength
+    enemy_list[enemy_index][4] -= enemy_damage
+    print(f"\n You scored {enemy_damage} points against {enemy_list[enemy_index][4]} enemy hp.")
 
-    # If enemy health is zero or below, remove it
+    # If enemy health is zero or below, remove it and grant XP
     if enemy_list[enemy_index][4] <= 0:
-        del enemy_list[enemy_index]  
+        enemy_type = enemy_list[enemy_index][2]  # Get enemy type
+        enemy_xp = ENEMIES_LIST[enemy_type].xp  # Get XP value from enemy
+        
+        player.xp += enemy_xp  # ✅ Update player's XP directly
+        player.levelup()
+        ui_panel.update_stats(player)  # ✅ Update UI
+        del enemy_list[enemy_index]  # Remove defeated enemy
 
-    # If all enemies are defeated, return to world map
-    if not enemy_list:
-        pygame.time.delay(500)  # Small delay before returning
-        returntomap()

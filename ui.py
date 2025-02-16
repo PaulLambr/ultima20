@@ -4,7 +4,7 @@ class UI:
     def __init__(self, player):
         self.player = player
         self.WIDTH = 250  # Panel width
-        self.HEIGHT = 400  # Panel height
+        self.HEIGHT = 800  # Panel height
         self.BACKGROUND_COLOR = (50, 50, 50)  # Dark gray panel
         self.TEXT_COLOR = (255, 255, 255)  # White text
         self.font = pygame.font.Font(None, 30)
@@ -16,6 +16,7 @@ class UI:
 
         # Display Player Stats
         stats = [
+            f"Level: {self.player.level}",
             f"HP: {self.player.hitpoints}",
             f"Strength: {self.player.strength}",
             f"Gold: {self.player.gold}",

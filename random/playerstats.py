@@ -16,23 +16,15 @@ class PlayerStats:
             self.level += 1
             self.hitpoints += random.randint(5, 10)  # Increase HP
             self.strength += random.randint(2, 5)  # Increase Strength
-            print(f"🎉 Level up! You are now level {self.level}!")
-            print(f"New Stats: HP={self.hitpoints}, Strength={self.strength}")
 
 # Initialize Player Stats
 player = PlayerStats(
-    level=1,
+    level=5,
     hitpoints=random.randint(10, 20),
     strength=random.randint(5, 10),
     gold=0,
     xp=0,
     weapon="None",
-    armor="None"
+    armor="Leather Tunic"
 )
 
-# Example usage
-print(f"Player HP: {player.hitpoints}, Strength: {player.strength}")
-
-# Simulate gaining XP and leveling up
-player.xp += 100
-player.levelup()

@@ -12,8 +12,8 @@ class Enemies:
 
 # Dictionary to store enemy types
 ENEMIES_LIST = {
-    "orc": Enemies(25, 10, 10, "grassland", "O",20),  
-    "troll": Enemies(35, 20, 15, "hills", "T",30)  
+    "orc": Enemies(12, 5, 10, "grassland", "O",20),  
+    "troll": Enemies(20, 10, 15, "hills", "T",30)  
 }
 
 # Function to spawn an enemy
@@ -41,7 +41,7 @@ def spawnenemy(world_map, GRID_SIZE):
 
     enemy_sprite = ENEMIES_LIST[enemy_type].lettersprite
 
-    return enemy_x, enemy_y, enemy_sprite  # Return enemy info instead of modifying global vars
+    return enemy_x, enemy_y, enemy_sprite, enemy_type  # Return enemy info instead of modifying global vars
 
 # Function to move enemy toward player
 def moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES):
