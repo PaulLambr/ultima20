@@ -136,6 +136,13 @@ while running:
                             player_x, player_y = restore_x, restore_y
                         
                         world_map[restore_y][restore_x] = "chest"
+                        # ✅ Apply the correct background to the chest
+                        TILE_TYPES["chest"].background = TILE_TYPES[tile_type].background
+                        TILE_TYPES["chest"].background2 = None  # Reset previous background
+                        TILE_TYPES["chest"].load_background()  # Reload with new background
+
+                        redraw_needed = True
+
 
                     # Reinitialize UI and screen
                         screen = pygame.display.set_mode((WIDTH, HEIGHT))  # Reset game window
@@ -174,6 +181,15 @@ while running:
                 
         # ✅ Then layer the sprite on top if it exists
                 if tile.sprite:
+                    current_tile2 = world_map[player_y][player_x]
+                    tile.getbg(current_tile2)
+                    redraw_needed = True
+                    
+                    if tile.background2:
+                        background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
+                        screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                    else:
+                        pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
                     sprite_scaled = pygame.transform.scale(tile.sprite, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
                     screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
 

@@ -36,10 +36,23 @@ class Tile:
             else:
                 print(f"Sprite file not found: {self.sprite_path}")
 
+    def getbg(self, current_tile2):
+        if current_tile2 == "hills":
+            self.background = "sprites/hills.png"
+        elif current_tile2 == "grassland":
+            self.background = "sprites/grassland.png"
+
+        self.background2 = None  # Reset the loaded background
+        self.load_background()  # Force the update
+
+
+
+
 # ✅ Dictionary to store tile types, but sprites are not loaded yet
 TILE_TYPES = {
-    "grassland": Tile(None, None, (34, 139, 34), True),
+    "grassland": Tile(None, "sprites/grassland.png", (34, 139, 34), True),
     "rock": Tile(None, None, (128, 128, 128), False),
     "hills": Tile(None, "sprites/hills.png", (255, 165, 0), True),
-    "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True)
+    "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True),
+    "avatar": Tile("sprites/avatar.png", None, None, False)
 }
