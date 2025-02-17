@@ -15,6 +15,10 @@ class MerchantWares:
         self.protection = protection
         self.healpower = healpower
 
+    def merchantinventory():
+        #reset dialog screen, display these 5 items with the purchvalue also showing. also each item needs a button to "buy". logic to limit potions to 5 in playerinventory
+        return
+
 MERCHANT_WARES = {
     "sword": MerchantWares("all", 100, 50, 10, None, None),
     "broadaxe": MerchantWares("all", 250, 125, 15, None, None),

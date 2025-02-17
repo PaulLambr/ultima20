@@ -99,7 +99,7 @@ def britannia_castle():
 
                 if selected_action == "Buy":
                     print("🛒 Entering merchant's inventory...")  # ✅ Should print when clicking "Buy"
-                    # merchantinventory()
+                    # merchantwares.merchantinventory()
                 elif selected_action == "Sell":
                     print("💰 Opening player inventory for selling...")  # ✅ Should print when clicking "Sell"
                     # playerinventory()

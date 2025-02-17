@@ -52,8 +52,8 @@ player = PlayerStats(
     xp=0,
     weapon="Dagger",
     armor="Cloth",
-    potions=0,
-    item1=0,
+    potions=3,
+    item1="Sword",
     item2=0
 )
 

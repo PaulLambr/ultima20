@@ -1,5 +1,6 @@
 import pygame
 
+
 class UI:
     def __init__(self, player):
         self.player = player
@@ -8,6 +9,12 @@ class UI:
         self.BACKGROUND_COLOR = (50, 50, 50)  # Dark gray panel
         self.TEXT_COLOR = (255, 255, 255)  # White text
         self.font = pygame.font.Font(None, 30)
+
+        # Button properties
+        self.button_color = (100, 100, 255)
+        self.button_hover_color = (150, 150, 255)
+        self.button_text_color = (255, 255, 255)
+        self.buttons = {}  # Store button rects
 
     def draw(self, screen):
         """Draws the stats panel on the right side of the game window."""
@@ -25,25 +32,83 @@ class UI:
             f"Armor: {self.player.armor}",
             f"Potions: {self.player.potions}",
             f"Item 1: {self.player.item1}",
-            f"Item 2: {self.player.item2}",
+            f"Item 3: {self.player.item2}",
         ]
 
         y_offset = 20
         for stat in stats:
+            self.font = pygame.font.Font(None, 30)
             text_surface = self.font.render(stat, True, self.TEXT_COLOR)
             screen.blit(text_surface, (panel_x + 10, y_offset))
             y_offset += 40
+
+        # Draw buttons (Equip, Drop)
+        self.buttons = {}  # Reset button storage
+        self.font = pygame.font.Font(None, 15)
+        button_x = 910
+        button_y = 355 # Position buttons at the bottom of the panel
+        button_width = 35
+        button_height = 20
+        spacing = 10
+
+        for option in ["Equip", "Drop"]:
+            rect = pygame.Rect(button_x, button_y, button_width, button_height)
+            self.buttons[option] = rect  # Store button rect
+
+            # Change color if hovering
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if rect.collidepoint(mouse_x, mouse_y):
+                pygame.draw.rect(screen, self.button_hover_color, rect)
+            else:
+                pygame.draw.rect(screen, self.button_color, rect)
+
+            # Draw text
+            text_surface = self.font.render(option, True, self.button_text_color)
+            screen.blit(text_surface, (button_x + 5, button_y + 5))
+
+            button_x += button_width + spacing  # Move to the right for next button
+
+        for option in ["Use"]:
+            button_x = 910
+            button_y = 300
+            rect = pygame.Rect(button_x, button_y, button_width, button_height)
+            self.buttons[option] = rect  # Store button rect
+
+            # Change color if hovering
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            if rect.collidepoint(mouse_x, mouse_y):
+                pygame.draw.rect(screen, self.button_hover_color, rect)
+            else:
+                pygame.draw.rect(screen, self.button_color, rect)
+
+            # Draw text
+            text_surface = self.font.render(option, True, self.button_text_color)
+            screen.blit(text_surface, (button_x + 5, button_y + 5))
+
+            #button_x += button_width + spacing  # Move to the right for next button
+
+
+    def handle_click(self, pos):
+        """Detects if a button was clicked and returns action."""
+        for option, rect in self.buttons.items():
+            if rect.collidepoint(pos):
+                return option  # Return "Buy" or "Sell"
+        return None
 
     def update_stats(self, player):
         """Updates the UI panel when player stats change."""
         self.player = player
 
-    #def usepotion(self, player):
-        #if player.potions and button press:
-            #player.hitpoints +=20
-            #player.potions -= 1
-            #update_stats(player)
-        
+    def usepotion(self, player):
+        if player.potions > 0:
+            print("Using healing potion")  
+            player.hitpoints += 20
+            player.potions -= 1
+            self.update_stats(player)  # ✅ Update stats
+            
+
+
+
 
 
 class Dialog:
@@ -104,3 +169,4 @@ class Dialog:
             if rect.collidepoint(pos):
                 return option  # Return "Buy" or "Sell"
         return None
+

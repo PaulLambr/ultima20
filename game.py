@@ -74,6 +74,14 @@ while running:
             running = False
 
         # Detect single key press event (not continuous holding)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+                selected_action = ui_panel.handle_click(event.pos)  # Get action
+            
+                if selected_action == "Use" and player.potions:
+                    redraw_needed = True
+                    ui_panel.usepotion(player)  # ✅ Correct
+
+
         if event.type == pygame.KEYDOWN:
             new_x, new_y = player_x, player_y
 
