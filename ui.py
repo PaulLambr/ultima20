@@ -1,4 +1,5 @@
 import pygame
+import merchantwares  # ✅ Import the module itself, not specific items
 
 
 class UI:
@@ -107,10 +108,6 @@ class UI:
             self.update_stats(player)  # ✅ Update stats
             
 
-
-
-
-
 class Dialog:
     def __init__(self):
         self.WIDTH = 800  
@@ -163,10 +160,77 @@ class Dialog:
 
             button_x += button_width + spacing  # Move to the right for next button
 
-    def handle_click(self, pos):
-        """Detects if a button was clicked and returns action."""
-        for option, rect in self.buttons.items():
-            if rect.collidepoint(pos):
-                return option  # Return "Buy" or "Sell"
+    def handle_click(self, pos, player):
+        """Detects if a Buy button was clicked and processes purchase."""
+        for item_name, rect in self.buttons.items():
+            if rect.collidepoint(pos):  # Check if the button was clicked
+                item_key = item_name.lower()
+
+                if item_key in merchantwares.MERCHANT_WARES:  # ✅ Reference via module
+                    item_data = merchantwares.MERCHANT_WARES[item_key]
+
+                    # Check if player has enough gold
+                    if player.gold >= item_data.purchvalue:
+                        player.gold -= item_data.purchvalue
+                        print(f"✅ Purchased {item_name} for {item_data.purchvalue} gold!")
+
+                    # Limit potions to 5 max
+                    if item_key == "potions":
+                        if player.potions >= 5:
+                            print("⚠️ You can only carry 5 potions!")
+                            player.gold += item_data.purchvalue  # Refund
+                            return None
+                        player.potions += 1
+                    else:
+                        # Assign to an inventory slot
+                        if player.item1 is None:
+                            player.item1 = item_key
+                        elif player.item2 is None:
+                            player.item2 = item_key
+                        else:
+                            print("⚠️ Inventory full! Sell or drop an item.")
+                            player.gold += item_data.purchvalue  # Refund gold
+                            return None
+                else:
+                    print("⚠️ Not enough gold!")
+                return item_name
         return None
 
+    
+    def draw2(self, screen, dialog_text):
+        
+        """Draws the merchant wares with purchase buttons."""
+        panel_y = screen.get_height() - self.HEIGHT  
+        pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
+
+        # Display text
+        y_offset = panel_y + 20
+        self.buttons = {}  # Reset buttons
+
+        for line in dialog_text:
+            text_surface = self.font.render(line, True, self.TEXT_COLOR)
+            screen.blit(text_surface, (10, y_offset))
+
+            # Draw Buy Button (for actual items)
+            if ":" in line:  # Ensures this line has an item to buy
+                item_name = line.split(":")[0].strip()
+                button_x = 600  
+                button_y = y_offset  
+                button_width = 80  
+                button_height = 30  
+
+                rect = pygame.Rect(button_x, button_y, button_width, button_height)
+                self.buttons[item_name] = rect  # Store button rect
+
+                # Change color if hovering
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if rect.collidepoint(mouse_x, mouse_y):
+                    pygame.draw.rect(screen, self.button_hover_color, rect)
+                else:
+                    pygame.draw.rect(screen, self.button_color, rect)
+
+                # Draw "Buy" text
+                text_surface = self.font.render("Buy", True, self.button_text_color)
+                screen.blit(text_surface, (button_x + 20, button_y + 5))
+
+            y_offset += 40  # Move down for next item

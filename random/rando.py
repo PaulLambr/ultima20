@@ -41,3 +41,14 @@ matchNumbers()
 #git pull origin main
 
 #player_level = 2
+
+#git branch
+#git checkout Potions
+#git pull origin Potions
+
+#git fetch origin
+#git checkout -b Potions origin/Potions
+
+
+
+

@@ -1,6 +1,5 @@
 import pygame
 import random
-from ui import UI, Dialog
 
 # ✅ Ensure pygame is initialized first
 pygame.init()  # 🔥 This must run before creating fonts in UI
@@ -15,9 +14,17 @@ class MerchantWares:
         self.protection = protection
         self.healpower = healpower
 
-    def merchantinventory():
-        #reset dialog screen, display these 5 items with the purchvalue also showing. also each item needs a button to "buy". logic to limit potions to 5 in playerinventory
-        return
+    def showwares():
+        global dialog_text, show_dialog  # Ensure we can modify these variables
+        dialog_text = ["What would you like to purchase?"]
+
+        for item, details in MERCHANT_WARES.items():
+            dialog_text.append(f"{item.capitalize()}: {details.purchvalue} gold")  
+
+        show_dialog = True  # Ensure dialog box is displayed
+
+      
+        
 
 MERCHANT_WARES = {
     "sword": MerchantWares("all", 100, 50, 10, None, None),

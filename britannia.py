@@ -3,6 +3,8 @@ from ui import UI, Dialog
 from gamestate import player, ui_panel, PlayerStats, dialog_panel
 from tiletypes.tiletypes import TILE_TYPES
 from utils import talk
+from merchantwares import MerchantWares  # Import it properly
+
 
 # Constants for Battle Screen
 CASTLE_GRID_SIZE = 13 
@@ -95,11 +97,11 @@ def britannia_castle():
 
             # ✅ Detect mouse click on buttons
             if event.type == pygame.MOUSEBUTTONDOWN and show_dialog:
-                selected_action = dialog_panel.handle_click(event.pos)  # Get action
+                selected_action = dialog_panel.handle_click(event.pos, player)  # Get action
 
                 if selected_action == "Buy":
                     print("🛒 Entering merchant's inventory...")  # ✅ Should print when clicking "Buy"
-                    # merchantwares.merchantinventory()
+                    MerchantWares.showwares()
                 elif selected_action == "Sell":
                     print("💰 Opening player inventory for selling...")  # ✅ Should print when clicking "Sell"
                     # playerinventory()
