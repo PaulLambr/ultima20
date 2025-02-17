@@ -23,6 +23,9 @@ class UI:
             f"XP: {self.player.xp}",
             f"Weapon: {self.player.weapon}",
             f"Armor: {self.player.armor}",
+            f"Potions: {self.player.potions}",
+            f"Item 1: {self.player.item1}",
+            f"Item 2: {self.player.item2}",
         ]
 
         y_offset = 20
@@ -34,6 +37,13 @@ class UI:
     def update_stats(self, player):
         """Updates the UI panel when player stats change."""
         self.player = player
+
+    #def usepotion(self, player):
+        #if player.potions and button press:
+            #player.hitpoints +=20
+            #player.potions -= 1
+            #update_stats(player)
+        
 
 
 class Dialog:

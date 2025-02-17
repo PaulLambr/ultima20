@@ -87,9 +87,6 @@ while running:
             if event.key == pygame.K_DOWN and player_y < GRID_SIZE - 1:
                 new_y += 1
 
-            if world_map[player_y][player_x] == world_map[7][10]:
-                britannia_castle()
-
             
             if event.key == pygame.K_o:  # Enter open chest mode
                 open_mode = True  
@@ -123,6 +120,9 @@ while running:
             if TILE_TYPES[world_map[new_y][new_x]].passable:
                 player_x, player_y = new_x, new_y
                 redraw_needed = True
+
+                if world_map[player_y][player_x] == world_map[7][10]:
+                    britannia_castle()
 
                 # Move the enemy towards the player
                 if enemy_present and enemy_x is not None and enemy_y is not None:
