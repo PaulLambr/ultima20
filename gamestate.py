@@ -1,6 +1,6 @@
 import pygame
 import random
-from ui import UI
+from ui import UI, Dialog
 
 # ✅ Ensure pygame is initialized first
 pygame.init()  # 🔥 This must run before creating fonts in UI
@@ -52,3 +52,4 @@ player = PlayerStats(
 
 # Initialize UI Panel
 ui_panel = UI(player)  # ✅ Now pygame is initialized before UI is created
+dialog_panel = Dialog()

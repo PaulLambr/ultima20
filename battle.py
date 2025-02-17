@@ -21,6 +21,8 @@ restore_x, restore_y = player_x, player_y
 
 def combat(player_level, tile_type, enemy_type):
     global attack_mode, pending_attack
+    player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar
+    player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
 
     pygame.init()
     WIDTH, HEIGHT = TILE_SIZE * BATTLE_GRID_SIZE + ui_panel.WIDTH, TILE_SIZE * BATTLE_GRID_SIZE
@@ -45,7 +47,7 @@ def combat(player_level, tile_type, enemy_type):
 
             # Ensure enemies do not start at the player's position
             if (enemy_x, enemy_y) != (player_x, player_y) and (enemy_x, enemy_y) not in [(ex, ey) for ex, ey, _, _, _ in enemy_list]: 
-                enemy_sprite = ENEMIES_LIST[enemy_type].lettersprite
+                enemy_sprite = ENEMIES_LIST[enemy_type]
                 enemy_health = ENEMIES_LIST[enemy_type].hitpoints
                 enemy_list.append([enemy_x, enemy_y, enemy_type, enemy_sprite, enemy_health])
                 break
@@ -131,15 +133,26 @@ def combat(player_level, tile_type, enemy_type):
                 #print(f"\ncombat 2 = {tile_type}")
                 tile_type = battle_map[row][col]
                 tile = TILE_TYPES[tile_type]
-                pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                if tile.background2:
+                    background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
+                    screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                else:
+                    pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
-        font = pygame.font.Font(None, 50)
-        player_text = font.render("A", True, WHITE)
-        screen.blit(player_text, (player_x * TILE_SIZE + 15, player_y * TILE_SIZE + 5))
+        #font = pygame.font.Font(None, 50)
+        #player_text = font.render("A", True, WHITE)
+        screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
         for ex, ey, et, es, hp in enemy_list:
-            enemy_text = font.render(es, True, WHITE)
-            screen.blit(enemy_text, (ex * TILE_SIZE + 15, ey * TILE_SIZE + 5))
+            enemy_obj = ENEMIES_LIST[et]  # ✅ Retrieve the Enemies object
+            enemy_obj.load_sprite()  # ✅ Ensure sprite is loaded
+
+            if enemy_obj.sprite:  # ✅ Ensure sprite is valid
+                enemy_scaled = pygame.transform.scale(enemy_obj.sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+                screen.blit(enemy_scaled, (ex * TILE_SIZE, ey * TILE_SIZE))
+            else:
+                print(f"⚠️ Warning: No sprite found for enemy type '{et}'")
+
 
         pygame.display.update()
 

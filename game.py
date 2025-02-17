@@ -10,7 +10,7 @@ GRID_SIZE = 15  # 15x15 map
 WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + 250, TILE_SIZE * GRID_SIZE  # UI width = 300
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-SPAWN_INTERVAL = 120  # Frames per spawn attempt
+SPAWN_INTERVAL = 250  # Frames per spawn attempt
 
 # ✅ Set up the display first!
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -24,6 +24,7 @@ from ui import UI
 from utils import returntomap, openchest
 from gamestate import player, ui_panel, PlayerStats
 from enemies.enemies import ENEMIES_LIST
+from britannia import britannia_castle
 for tile in TILE_TYPES.values():
     tile.load_sprite()
     tile.load_background()
@@ -35,6 +36,7 @@ world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 world_map[3][3] = "rock"
 world_map[5][6] = "rock"
 world_map[7][7] = "rock"
+world_map[7][10] = "britannia"
 world_map[10][10] = "rock"
 world_map[12][14] = "hills"
 world_map[14][14] = "hills"
@@ -46,6 +48,9 @@ world_map[10][14] = "hills"
 player_x, player_y = 0, 0
 player_level = 1
 restore_x, restore_y = player_x, player_y  # Ensure it's initialized
+player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar
+player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+
 
 # Enemy tracking variables (initialized as None)
 enemy_present = False
@@ -81,6 +86,9 @@ while running:
                 new_y -= 1
             if event.key == pygame.K_DOWN and player_y < GRID_SIZE - 1:
                 new_y += 1
+
+            if world_map[player_y][player_x] == world_map[7][10]:
+                britannia_castle()
 
             
             if event.key == pygame.K_o:  # Enter open chest mode
@@ -193,15 +201,16 @@ while running:
                     sprite_scaled = pygame.transform.scale(tile.sprite, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
                     screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
 
-        # Draw 'A' at the player's position
-        font = pygame.font.Font(None, 50)
-        text = font.render("A", True, WHITE)
-        screen.blit(text, (player_x * TILE_SIZE + 15, player_y * TILE_SIZE + 5))
+    
+        # Draw player sprite at the player's position
+        screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-        # Draw enemy if present
+
+       # Draw enemy if present
         if enemy_present and enemy_sprite:
-            text = font.render(enemy_sprite, True, WHITE)
-            screen.blit(text, (enemy_x * TILE_SIZE + 15, enemy_y * TILE_SIZE + 5))
+            enemy_scaled = pygame.transform.scale(enemy_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+            screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))
+
 
         # Draw UI Panel (Stats)
         ui_panel.draw(screen)

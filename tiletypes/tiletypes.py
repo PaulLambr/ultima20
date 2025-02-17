@@ -18,7 +18,7 @@ class Tile:
             if os.path.exists(self.background):  
                 try:
                     self.background2 = pygame.image.load(self.background).convert_alpha()
-                    print(f"Loaded sprite: {self.background}")
+                    #print(f"Loaded sprite: {self.background}")
                 except pygame.error as e:
                     print(f"Error loading {self.background}: {e}")
             else:
@@ -54,5 +54,7 @@ TILE_TYPES = {
     "rock": Tile(None, None, (128, 128, 128), False),
     "hills": Tile(None, "sprites/hills.png", (255, 165, 0), True),
     "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True),
-    "avatar": Tile("sprites/avatar.png", None, None, False)
+    "avatar": Tile("sprites/avatar.png", None, (128, 128, 128), False),
+    "britannia": Tile("sprites/castle.png", None, (128, 128, 128), True),
+    "merchant": Tile("sprites/avatar.png", None, (128, 128, 128), False)
 }

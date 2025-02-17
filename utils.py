@@ -1,6 +1,6 @@
 from enemies.enemies import ENEMIES_LIST
 from gamestate import player
-from ui import UI
+from ui import UI, Dialog
 import pygame
 import random
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
@@ -12,15 +12,6 @@ def returntomap(player_x, player_y, restore_x, restore_y):
     Restores the player's position after combat.
     """
     return restore_x, restore_y  # Return new position
-
-import pygame
-import random
-
-import pygame
-import random
-
-import pygame
-import random
 
 def openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LIST, enemy_type, ui_panel, current_tile):
     """Handles opening chests adjacent to the player and granting rewards."""
@@ -67,3 +58,24 @@ def openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LI
             print(f"🎉 Chest opened! You found {loot_amount} gold.")
         else:
             print("❌ No chest in that direction.")
+
+def talk(player_x, player_y, pending_talk, castle_map):
+    talk_x, talk_y = player_x, player_y  
+
+    if pending_talk == pygame.K_LEFT:
+        talk_x -= 1
+    elif pending_talk == pygame.K_RIGHT:
+        talk_x += 1
+    elif pending_talk == pygame.K_UP:
+        talk_y -= 1
+    elif pending_talk == pygame.K_DOWN:
+        talk_y += 1
+
+    if 0 <= talk_x < len(castle_map) and 0 <= talk_y < len(castle_map[0]):  
+        if castle_map[talk_y][talk_x] == "merchant":
+            print(f"✅ Merchant detected at ({talk_x}, {talk_y})")
+            return True, ["Welcome to my humble shoppe"]  # ✅ Enable dialog & send text
+        else:
+            print("❌ No merchant in that direction.")
+
+    return False, []  # ✅ No dialog if not a merchant
