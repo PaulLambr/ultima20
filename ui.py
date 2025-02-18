@@ -160,41 +160,51 @@ class Dialog:
 
             button_x += button_width + spacing  # Move to the right for next button
 
-    def handle_click(self, pos, player):
+    def handle_click(self, pos):
+        """Detects if a button was clicked in the main merchant menu and returns action."""
+        for option, rect in self.buttons.items():
+            if rect.collidepoint(pos):
+                return option  # Return "Buy" or "Sell"
+        return None
+
+
+    def handle_purchase_click(self, pos, player):
         """Detects if a Buy button was clicked and processes purchase."""
         for item_name, rect in self.buttons.items():
-            if rect.collidepoint(pos):  # Check if the button was clicked
+            if rect.collidepoint(pos):  # ✅ Check if the button was clicked
                 item_key = item_name.lower()
 
-                if item_key in merchantwares.MERCHANT_WARES:  # ✅ Reference via module
+                if item_key in merchantwares.MERCHANT_WARES:
                     item_data = merchantwares.MERCHANT_WARES[item_key]
 
-                    # Check if player has enough gold
                     if player.gold >= item_data.purchvalue:
-                        player.gold -= item_data.purchvalue
+                        player.gold -= item_data.purchvalue  # ✅ Deduct gold
                         print(f"✅ Purchased {item_name} for {item_data.purchvalue} gold!")
 
-                    # Limit potions to 5 max
-                    if item_key == "potions":
-                        if player.potions >= 5:
-                            print("⚠️ You can only carry 5 potions!")
-                            player.gold += item_data.purchvalue  # Refund
-                            return None
-                        player.potions += 1
-                    else:
-                        # Assign to an inventory slot
-                        if player.item1 is None:
-                            player.item1 = item_key
-                        elif player.item2 is None:
-                            player.item2 = item_key
+                        # ✅ Limit potions to 5 max
+                        if item_key == "potions":
+                            if player.potions >= 5:
+                                print("⚠️ You can only carry 5 potions!")
+                                player.gold += item_data.purchvalue  # Refund
+                                return None
+                            player.potions += 1
                         else:
-                            print("⚠️ Inventory full! Sell or drop an item.")
-                            player.gold += item_data.purchvalue  # Refund gold
-                            return None
-                else:
-                    print("⚠️ Not enough gold!")
-                return item_name
+                            # ✅ Assign to an inventory slot
+                            if player.item1 is None:
+                                player.item1 = item_key
+                            elif player.item2 is None:
+                                player.item2 = item_key
+                            else:
+                                print("⚠️ Inventory full! Sell or drop an item.")
+                                player.gold += item_data.purchvalue  # Refund gold
+                                return None
+                    else:
+                        print("⚠️ Not enough gold!")
+                        return None
+
+                    return item_name  # ✅ Return purchased item
         return None
+
 
     
     def draw2(self, screen, dialog_text):

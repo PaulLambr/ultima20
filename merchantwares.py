@@ -15,13 +15,14 @@ class MerchantWares:
         self.healpower = healpower
 
     def showwares():
-        global dialog_text, show_dialog  # Ensure we can modify these variables
+        global dialog_text, show_dialog  # Ensure dialog_text is global
         dialog_text = ["What would you like to purchase?"]
 
-        for item, details in MERCHANT_WARES.items():
-            dialog_text.append(f"{item.capitalize()}: {details.purchvalue} gold")  
+        for item, details in MerchantWares.MERCHANT_WARES.items():
+            dialog_text.append(f"{item.capitalize()}: {details.purchvalue} gold")
 
-        show_dialog = True  # Ensure dialog box is displayed
+            show_dialog = True  # ✅ Ensure the dialog box is displayed
+
 
       
         

@@ -95,16 +95,23 @@ def britannia_castle():
                         print("Returning to the overworld...")
                         return  
 
-            # ✅ Detect mouse click on buttons
             if event.type == pygame.MOUSEBUTTONDOWN and show_dialog:
-                selected_action = dialog_panel.handle_click(event.pos, player)  # Get action
+                if merchant_mode:  # ✅ If we are in the merchant inventory UI
+                    selected_item = dialog_panel.handle_purchase_click(event.pos, player)  # ✅ Handle buying items
+                else:  # ✅ If we are in the Buy/Sell menu
+                    selected_action = dialog_panel.handle_click(event.pos)  # ✅ Get "Buy" or "Sell"
 
-                if selected_action == "Buy":
-                    print("🛒 Entering merchant's inventory...")  # ✅ Should print when clicking "Buy"
-                    MerchantWares.showwares()
-                elif selected_action == "Sell":
-                    print("💰 Opening player inventory for selling...")  # ✅ Should print when clicking "Sell"
-                    # playerinventory()
+                    if selected_action == "Buy":
+                        print("🛒 Entering merchant's inventory...")  
+                        MerchantWares.showwares()  # ✅ Update the merchant dialog
+                        merchant_mode = True  # ✅ Switch to merchant inventory mode
+                        dialog_panel.draw2(screen, dialog_text)  # ✅ Show merchant wares UI
+
+                    elif selected_action == "Sell":
+                        print("💰 Opening player inventory for selling...")
+                        # TODO: Add selling logic here
+
+
 
         # Draw the screen
         screen.fill(BLACK)
