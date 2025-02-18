@@ -16,8 +16,11 @@ def britannia_castle():
     pygame.init()
     talk_mode = False
     show_dialog = False  # ✅ Track whether the dialog panel is visible
+    show_dialog2 = False
     dialog_text = []  # ✅ Store the current dialog text
     selected_action = None
+    selected_item = None
+ 
 
     player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  
     player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))  
@@ -33,6 +36,7 @@ def britannia_castle():
 
     # Player starts in the center
     player_x, player_y = 7, 7  
+    merchant_mode = False
 
     running = True
     clock = pygame.time.Clock()
@@ -95,21 +99,25 @@ def britannia_castle():
                         print("Returning to the overworld...")
                         return  
 
-            if event.type == pygame.MOUSEBUTTONDOWN and show_dialog:
-                if merchant_mode:  # ✅ If we are in the merchant inventory UI
-                    selected_item = dialog_panel.handle_purchase_click(event.pos, player)  # ✅ Handle buying items
-                else:  # ✅ If we are in the Buy/Sell menu
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if show_dialog:
                     selected_action = dialog_panel.handle_click(event.pos)  # ✅ Get "Buy" or "Sell"
-
+        
                     if selected_action == "Buy":
-                        print("🛒 Entering merchant's inventory...")  
-                        MerchantWares.showwares()  # ✅ Update the merchant dialog
-                        merchant_mode = True  # ✅ Switch to merchant inventory mode
-                        dialog_panel.draw2(screen, dialog_text)  # ✅ Show merchant wares UI
+                        print("🛒 Entering merchant's inventory...") 
+                        dialog_text = MerchantWares.showwares()  # ✅ Capture updated dialog
+                        show_dialog = False  # Hide the first dialog
+                        show_dialog2 = True  # ✅ Show the merchant inventory
 
                     elif selected_action == "Sell":
                         print("💰 Opening player inventory for selling...")
                         # TODO: Add selling logic here
+
+                elif show_dialog2:  # ✅ Handle purchasing when merchant inventory is shown
+                    selected_item = dialog_panel.handle_purchase_click(event.pos, player)
+        
+                    if selected_item:  # ✅ Ensure the player actually clicked an item
+                        print(f"\nYou purchased {selected_item}")  # ✅ Print correct item
 
 
 
@@ -145,6 +153,9 @@ def britannia_castle():
 
         if show_dialog:  # ✅ Only draw dialog if active
             dialog_panel.draw(screen, dialog_text)
+
+        if show_dialog2:
+            dialog_panel.draw2(screen, dialog_text)
 
         pygame.display.update()
 

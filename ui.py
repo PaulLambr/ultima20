@@ -160,14 +160,6 @@ class Dialog:
 
             button_x += button_width + spacing  # Move to the right for next button
 
-    def handle_click(self, pos):
-        """Detects if a button was clicked in the main merchant menu and returns action."""
-        for option, rect in self.buttons.items():
-            if rect.collidepoint(pos):
-                return option  # Return "Buy" or "Sell"
-        return None
-
-
     def handle_purchase_click(self, pos, player):
         """Detects if a Buy button was clicked and processes purchase."""
         for item_name, rect in self.buttons.items():
@@ -177,39 +169,47 @@ class Dialog:
                 if item_key in merchantwares.MERCHANT_WARES:
                     item_data = merchantwares.MERCHANT_WARES[item_key]
 
-                    if player.gold >= item_data.purchvalue:
-                        player.gold -= item_data.purchvalue  # ✅ Deduct gold
-                        print(f"✅ Purchased {item_name} for {item_data.purchvalue} gold!")
+                if player.gold >= item_data.purchvalue:
+                    player.gold -= item_data.purchvalue  # ✅ Deduct gold
+                    print(f"✅ Purchased {item_name} for {item_data.purchvalue} gold!")
 
-                        # ✅ Limit potions to 5 max
-                        if item_key == "potions":
-                            if player.potions >= 5:
-                                print("⚠️ You can only carry 5 potions!")
-                                player.gold += item_data.purchvalue  # Refund
-                                return None
-                            player.potions += 1
-                        else:
-                            # ✅ Assign to an inventory slot
-                            if player.item1 is None:
-                                player.item1 = item_key
-                            elif player.item2 is None:
-                                player.item2 = item_key
-                            else:
-                                print("⚠️ Inventory full! Sell or drop an item.")
-                                player.gold += item_data.purchvalue  # Refund gold
-                                return None
+                    # ✅ Limit potions to 5 max
+                    if item_key == "potions":
+                        if player.potions >= 5:
+                            print("⚠️ You can only carry 5 potions!")
+                            player.gold += item_data.purchvalue  # Refund
+                            return None
+                        player.potions += 1
                     else:
-                        print("⚠️ Not enough gold!")
-                        return None
+                        # ✅ Assign to an inventory slot
+                        if player.item1 is None:
+                            player.item1 = item_key
+                        elif player.item2 is None:
+                            player.item2 = item_key
+                        else:
+                            print("⚠️ Inventory full! Sell or drop an item.")
+                            player.gold += item_data.purchvalue  # Refund gold
+                            return None
+                else:
+                    print("⚠️ Not enough gold!")
+                    return None
 
-                    return item_name  # ✅ Return purchased item
-        return None
+                return item_name  # ✅ Return purchased item
+        return None  # ✅ Return None if no item was clicked
+
+    def handle_click(self, pos):
+        """Detects if a button was clicked in the main merchant menu and returns action."""
+        for option, rect in self.buttons.items():
+            if rect.collidepoint(pos):
+                return option  # ✅ Return "Buy" or "Sell"
+        return None  # ✅ Return None if no button was clicked
 
 
     
     def draw2(self, screen, dialog_text):
         
         """Draws the merchant wares with purchase buttons."""
+        self.font = pygame.font.Font(None, 22)
         panel_y = screen.get_height() - self.HEIGHT  
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
 
@@ -224,7 +224,7 @@ class Dialog:
             # Draw Buy Button (for actual items)
             if ":" in line:  # Ensures this line has an item to buy
                 item_name = line.split(":")[0].strip()
-                button_x = 600  
+                button_x = 400  
                 button_y = y_offset  
                 button_width = 80  
                 button_height = 30  
@@ -243,4 +243,4 @@ class Dialog:
                 text_surface = self.font.render("Buy", True, self.button_text_color)
                 screen.blit(text_surface, (button_x + 20, button_y + 5))
 
-            y_offset += 40  # Move down for next item
+            y_offset += 25  # Move down for next item

@@ -10,7 +10,7 @@ GRID_SIZE = 15  # 15x15 map
 WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + 250, TILE_SIZE * GRID_SIZE  # UI width = 300
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-SPAWN_INTERVAL = 250  # Frames per spawn attempt
+SPAWN_INTERVAL = 200  # Frames per spawn attempt
 
 # ✅ Set up the display first!
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
