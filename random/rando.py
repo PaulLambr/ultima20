@@ -1,7 +1,9 @@
 import random  # Import random module
 
+
 def randomNumber():
     return random.randint(1, 50)  # Generate a random number between 1 and 50
+
 
 def matchNumbers():
     generated_number = randomNumber()  # Get a random number
@@ -28,27 +30,26 @@ def matchNumbers():
             if attempts > 0:
                 print(f"You have {attempts} attempts remaining.")
             else:
-                print(f"\nYou ran out of tries. The correct answer was {generated_number}.")
+                print(
+                    f"\nYou ran out of tries. The correct answer was {generated_number}."
+                )
         except ValueError:
             print("Invalid input! Please enter a valid number.")
+
 
 # Call the function
 matchNumbers()
 
-#git add .
-#git commit -m "Updated some files"
-#git push
-#git pull origin main
+# git add .
+# git commit -m "Updated some files"
+# git push
+# git pull origin main
 
-#player_level = 2
+# player_level = 2
 
-#git branch
-#git checkout Potions
-#git pull origin Potions
+# git branch
+# git checkout Potions
+# git pull origin Potions
 
-#git fetch origin
-#git checkout -b Potions origin/Potions
-
-
-
-
+# git fetch origin
+# git checkout -b Potions origin/Potions

@@ -13,11 +13,22 @@ def returntomap(player_x, player_y, restore_x, restore_y):
     """
     return restore_x, restore_y  # Return new position
 
-def openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LIST, enemy_type, ui_panel, current_tile):
-    """Handles opening chests adjacent to the player and granting rewards."""
-    global redraw_needed  
 
-    open_x, open_y = player_x, player_y  
+def openchest(
+    player_x,
+    player_y,
+    pending_open,
+    world_map,
+    GRID_SIZE,
+    ENEMIES_LIST,
+    enemy_type,
+    ui_panel,
+    current_tile,
+):
+    """Handles opening chests adjacent to the player and granting rewards."""
+    global redraw_needed
+
+    open_x, open_y = player_x, player_y
 
     # Determine chest location based on direction key
     if pending_open == pygame.K_LEFT:
@@ -42,15 +53,17 @@ def openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LI
                 loot_factor = ENEMIES_LIST[enemy_type].loot  # Use .loot directly
             else:
                 loot_factor = 5  # Default loot if no enemy
-            loot_amount = random.randint(1, 2) * loot_factor  
+            loot_amount = random.randint(1, 2) * loot_factor
             player.gold += loot_amount
 
             # ✅ Replace the chest with the original terrain
             world_map[open_y][open_x] = original_tile
-            print(f"✅ Chest removed. Tile at ({open_x}, {open_y}) is now '{original_tile}'.")
+            print(
+                f"✅ Chest removed. Tile at ({open_x}, {open_y}) is now '{original_tile}'."
+            )
 
             # ✅ Force redraw
-            redraw_needed = True  
+            redraw_needed = True
 
             # ✅ Update UI panel
             ui_panel.update_stats(player)
@@ -59,8 +72,9 @@ def openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LI
         else:
             print("❌ No chest in that direction.")
 
+
 def talk(player_x, player_y, pending_talk, castle_map):
-    talk_x, talk_y = player_x, player_y  
+    talk_x, talk_y = player_x, player_y
 
     if pending_talk == pygame.K_LEFT:
         talk_x -= 1
@@ -71,7 +85,7 @@ def talk(player_x, player_y, pending_talk, castle_map):
     elif pending_talk == pygame.K_DOWN:
         talk_y += 1
 
-    if 0 <= talk_x < len(castle_map) and 0 <= talk_y < len(castle_map[0]):  
+    if 0 <= talk_x < len(castle_map) and 0 <= talk_y < len(castle_map[0]):
         if castle_map[talk_y][talk_x] == "merchant":
             print(f"✅ Merchant detected at ({talk_x}, {talk_y})")
             return True, ["Welcome to my humble shoppe"]  # ✅ Enable dialog & send text

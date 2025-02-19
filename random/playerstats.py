@@ -1,9 +1,10 @@
 import random
 
+
 class PlayerStats:
     def __init__(self, level, hitpoints, strength, gold, xp, weapon, armor):
         self.level = level
-        self.hitpoints = hitpoints  
+        self.hitpoints = hitpoints
         self.strength = strength
         self.gold = gold
         self.xp = xp
@@ -17,6 +18,7 @@ class PlayerStats:
             self.hitpoints += random.randint(5, 10)  # Increase HP
             self.strength += random.randint(2, 5)  # Increase Strength
 
+
 # Initialize Player Stats
 player = PlayerStats(
     level=5,
@@ -25,6 +27,5 @@ player = PlayerStats(
     gold=0,
     xp=0,
     weapon="None",
-    armor="Leather Tunic"
+    armor="Leather Tunic",
 )
-

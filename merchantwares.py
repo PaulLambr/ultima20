@@ -3,14 +3,18 @@ import pygame
 # ✅ Ensure pygame is initialized first
 pygame.init()  # 🔥 This must run before creating fonts in UI
 
+
 class MerchantWares:
-    def __init__(self, availability, purchvalue, sellvalue, damage, protection, healpower):
+    def __init__(
+        self, availability, purchvalue, sellvalue, damage, protection, healpower, item_name
+    ):
         self.availability = availability
         self.purchvalue = purchvalue
         self.sellvalue = sellvalue
         self.damage = damage
         self.protection = protection
         self.healpower = healpower
+        self.item_name = item_name
 
     @staticmethod
     def showwares():
@@ -19,15 +23,17 @@ class MerchantWares:
         dialog_text = ["What would you like to purchase?"]
 
         for item, details in MERCHANT_WARES.items():
-            dialog_text.append(f"{item.capitalize()}: {details.purchvalue} gold")
+            dialog_text.append(f"{details.item_name}: {details.purchvalue} gold")  # ✅ Always show the correct item name
+
 
         return dialog_text  # ✅ Return the list to update the dialog panel
 
+
 # ✅ Define `MERCHANT_WARES` as a global dictionary
 MERCHANT_WARES = {
-    "sword": MerchantWares("all", 100, 50, 10, None, None),
-    "broadaxe": MerchantWares("all", 250, 125, 15, None, None),
-    "leatherarmor": MerchantWares("all", 200, 100, None, 50, None),
-    "chainmail": MerchantWares("all", 500, 250, None, 100, None),
-    "potions": MerchantWares("all", 30, None, None, None, 25),
+    "vorpal blade": MerchantWares("all", 100, 50, 10, None, None, "Vorpal Blade"),
+    "morningstar": MerchantWares("all", 250, 125, 15, None, None, "Morningstar"),
+    "leather armor": MerchantWares("all", 200, 100, None, 50, None, "Leather Armor"),
+    "hauberk": MerchantWares("all", 500, 250, None, 100, None, "Hauberk"),
+    "healing salve": MerchantWares("all", 30, None, None, None, 25, "Healing Salve"),
 }

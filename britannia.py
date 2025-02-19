@@ -7,10 +7,11 @@ from merchantwares import MerchantWares  # Import it properly
 
 
 # Constants for Battle Screen
-CASTLE_GRID_SIZE = 13 
+CASTLE_GRID_SIZE = 13
 TILE_SIZE = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
 
 def britannia_castle():
     pygame.init()
@@ -20,12 +21,14 @@ def britannia_castle():
     dialog_text = []  # ✅ Store the current dialog text
     selected_action = None
     selected_item = None
- 
 
-    player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  
-    player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))  
+    player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()
+    player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))
 
-    WIDTH, HEIGHT = TILE_SIZE * CASTLE_GRID_SIZE + ui_panel.WIDTH, TILE_SIZE * CASTLE_GRID_SIZE + dialog_panel.HEIGHT
+    WIDTH, HEIGHT = (
+        TILE_SIZE * CASTLE_GRID_SIZE + ui_panel.WIDTH,
+        TILE_SIZE * CASTLE_GRID_SIZE + dialog_panel.HEIGHT,
+    )
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Welcome to Britannia Castle!")
 
@@ -35,7 +38,7 @@ def britannia_castle():
     castle_map[2][3] = "merchant"
 
     # Player starts in the center
-    player_x, player_y = 7, 7  
+    player_x, player_y = 7, 7
     merchant_mode = False
 
     running = True
@@ -49,16 +52,16 @@ def britannia_castle():
                 running = False
 
             # ✅ Handle Keyboard Input
-            if event.type == pygame.KEYDOWN:  
-                if event.key == pygame.K_t:  
-                    talk_mode = True  
-                    pending_talk = None  
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_t:
+                    talk_mode = True
+                    pending_talk = None
                     print("Talk mode activated. Press a direction key.")
-                    continue  
+                    continue
 
-                if talk_mode:  
-                    pending_talk = event.key  
-                    talk_mode = False  
+                if talk_mode:
+                    pending_talk = event.key
+                    talk_mode = False
 
                     # Determine conversation location
                     talk_x, talk_y = player_x, player_y
@@ -71,9 +74,14 @@ def britannia_castle():
                     elif pending_talk == pygame.K_DOWN:
                         talk_y += 1
 
-                    # Ensure within bounds 
-                    if 0 <= talk_x < CASTLE_GRID_SIZE and 0 <= talk_y < CASTLE_GRID_SIZE:
-                        show_dialog, dialog_text = talk(player_x, player_y, pending_talk, castle_map)  # ✅ Get dialog data
+                    # Ensure within bounds
+                    if (
+                        0 <= talk_x < CASTLE_GRID_SIZE
+                        and 0 <= talk_y < CASTLE_GRID_SIZE
+                    ):
+                        show_dialog, dialog_text = talk(
+                            player_x, player_y, pending_talk, castle_map
+                        )  # ✅ Get dialog data
 
                 # ✅ Allow closing dialog with ESC
                 if event.key == pygame.K_ESCAPE:
@@ -90,22 +98,26 @@ def britannia_castle():
                     if event.key == pygame.K_UP and player_y > 0:
                         new_y -= 1
                     if event.key == pygame.K_DOWN and player_y < CASTLE_GRID_SIZE - 1:
-                        new_y += 1 
+                        new_y += 1
 
                     if TILE_TYPES[castle_map[new_y][new_x]].passable:
-                        player_x, player_y = new_x, new_y  
+                        player_x, player_y = new_x, new_y
 
-                    if new_x == 7 and new_y == 7:  
+                    if new_x == 7 and new_y == 7:
                         print("Returning to the overworld...")
-                        return  
+                        return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if show_dialog:
-                    selected_action = dialog_panel.handle_click(event.pos)  # ✅ Get "Buy" or "Sell"
-        
+                    selected_action = dialog_panel.handle_click(
+                        event.pos
+                    )  # ✅ Get "Buy" or "Sell"
+
                     if selected_action == "Buy":
-                        print("🛒 Entering merchant's inventory...") 
-                        dialog_text = MerchantWares.showwares()  # ✅ Capture updated dialog
+                        print("🛒 Entering merchant's inventory...")
+                        dialog_text = (
+                            MerchantWares.showwares()
+                        )  # ✅ Capture updated dialog
                         show_dialog = False  # Hide the first dialog
                         show_dialog2 = True  # ✅ Show the merchant inventory
 
@@ -113,13 +125,17 @@ def britannia_castle():
                         print("💰 Opening player inventory for selling...")
                         # TODO: Add selling logic here
 
-                elif show_dialog2:  # ✅ Handle purchasing when merchant inventory is shown
-                    selected_item = dialog_panel.handle_purchase_click(event.pos, player)
-        
+                elif (
+                    show_dialog2
+                ):  # ✅ Handle purchasing when merchant inventory is shown
+                    selected_item = dialog_panel.handle_purchase_click(
+                        event.pos, player
+                    )
+
                     if selected_item:  # ✅ Ensure the player actually clicked an item
-                        print(f"\nYou purchased {selected_item}")  # ✅ Print correct item
-
-
+                        print(
+                            f"\nYou purchased {selected_item}"
+                        )  # ✅ Print correct item
 
         # Draw the screen
         screen.fill(BLACK)
@@ -131,23 +147,39 @@ def britannia_castle():
                 tile = TILE_TYPES[tile_type]
 
                 if tile.background2:
-                    background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))
-                    screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                    background_scaled = pygame.transform.scale(
+                        tile.background2, (TILE_SIZE, TILE_SIZE)
+                    )
+                    screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE))
                 else:
-                    pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                    pygame.draw.rect(
+                        screen,
+                        tile.color,
+                        (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                    )
 
                 if tile.sprite:
                     current_tile2 = castle_map[player_y][player_x]
                     tile.getbg(current_tile2)
                     redraw_needed = True
-                    
+
                     if tile.background2:
-                        background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
-                        screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                        background_scaled = pygame.transform.scale(
+                            tile.background2, (TILE_SIZE, TILE_SIZE)
+                        )  # Ensure correct size
+                        screen.blit(
+                            background_scaled, (col * TILE_SIZE, row * TILE_SIZE)
+                        )
                     else:
-                        pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-                    sprite_scaled = pygame.transform.scale(tile.sprite, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
-                    screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                        pygame.draw.rect(
+                            screen,
+                            tile.color,
+                            (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                        )
+                    sprite_scaled = pygame.transform.scale(
+                        tile.sprite, (TILE_SIZE, TILE_SIZE)
+                    )  # Ensure correct size
+                    screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE))
 
         screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
@@ -159,4 +191,4 @@ def britannia_castle():
 
         pygame.display.update()
 
-    return  
+    return

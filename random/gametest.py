@@ -17,9 +17,7 @@ pygame.display.set_caption("Move 'A' on a 15x15 Tile Map")
 clock = pygame.time.Clock()  # Controls frame rate
 
 # Sample 15x15 map using tile type keys
-world_map = [
-    ["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)
-]
+world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 
 # Add some rocks manually for testing (impassable areas)
 world_map[3][3] = "rock"
@@ -68,7 +66,11 @@ while running:
             for col in range(GRID_SIZE):
                 tile_type = world_map[row][col]
                 tile = TILE_TYPES[tile_type]
-                pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                pygame.draw.rect(
+                    screen,
+                    tile.color,
+                    (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                )
 
         # Draw 'A' at the player's position
         font = pygame.font.Font(None, 50)

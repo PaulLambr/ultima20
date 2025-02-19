@@ -31,9 +31,9 @@ class UI:
             f"XP: {self.player.xp}",
             f"Weapon: {self.player.weapon}",
             f"Armor: {self.player.armor}",
-            f"Potions: {self.player.potions}",
+            f"Salves: {self.player.potions}",
             f"Item 1: {self.player.item1}",
-            f"Item 3: {self.player.item2}",
+            f"Item 2: {self.player.item2}",
         ]
 
         y_offset = 20
@@ -108,12 +108,13 @@ class UI:
             self.update_stats(player)  # ✅ Update stats
             
 
+
 class Dialog:
     def __init__(self):
-        self.WIDTH = 800  
-        self.HEIGHT = 200  
-        self.BACKGROUND_COLOR = (50, 50, 50)  
-        self.TEXT_COLOR = (255, 255, 255)  
+        self.WIDTH = 800
+        self.HEIGHT = 200
+        self.BACKGROUND_COLOR = (50, 50, 50)
+        self.TEXT_COLOR = (255, 255, 255)
         self.font = pygame.font.Font(None, 30)
 
         # Button properties
@@ -124,7 +125,7 @@ class Dialog:
 
     def draw(self, screen, dialog_text):
         """Draws the dialog panel at the bottom of the screen."""
-        panel_y = screen.get_height() - self.HEIGHT  
+        panel_y = screen.get_height() - self.HEIGHT
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
 
         # Display text
@@ -136,7 +137,6 @@ class Dialog:
 
         # Draw buttons (Buy, Sell)
         self.buttons = {}  # Reset button storage
-
         button_x = 50
         button_y = panel_y + 120  # Position buttons at the bottom of the panel
         button_width = 100
@@ -164,37 +164,45 @@ class Dialog:
         """Detects if a Buy button was clicked and processes purchase."""
         for item_name, rect in self.buttons.items():
             if rect.collidepoint(pos):  # ✅ Check if the button was clicked
-                item_key = item_name.lower()
+                key_name = item_name.lower()  # ✅ Normalize to lowercase
+                if key_name in merchantwares.MERCHANT_WARES:
+                     item_data = merchantwares.MERCHANT_WARES[key_name]
 
-                if item_key in merchantwares.MERCHANT_WARES:
-                    item_data = merchantwares.MERCHANT_WARES[item_key]
+                else:
+                    print(f"⚠️ Item '{item_name}' not found in merchantwares!")
+                    return None  # ✅ Exit if the item doesn't exist
 
                 if player.gold >= item_data.purchvalue:
                     player.gold -= item_data.purchvalue  # ✅ Deduct gold
-                    print(f"✅ Purchased {item_name} for {item_data.purchvalue} gold!")
+                    print(f"✅ Purchased {item_data.item_name} for {item_data.purchvalue} gold!")
 
                     # ✅ Limit potions to 5 max
-                    if item_key == "potions":
+                    if item_data.item_name == "Healing Salve":
                         if player.potions >= 5:
                             print("⚠️ You can only carry 5 potions!")
                             player.gold += item_data.purchvalue  # Refund
                             return None
                         player.potions += 1
                     else:
-                        # ✅ Assign to an inventory slot
-                        if player.item1 is None:
-                            player.item1 = item_key
-                        elif player.item2 is None:
-                            player.item2 = item_key
+                        # ✅ Check inventory slots and assign the item correctly
+                        if not player.item1:  # First slot empty
+                            player.item1 = item_data.item_name
+                            print(f"👜 Added {item_data.item_name} to inventory slot 1")
+                        elif not player.item2:  # Second slot empty
+                            player.item2 = item_data.item_name
+                            print(f"👜 Added {item_data.item_name} to inventory slot 2")
                         else:
                             print("⚠️ Inventory full! Sell or drop an item.")
                             player.gold += item_data.purchvalue  # Refund gold
                             return None
+                        print(f"Inventory: Slot 1 = {player.item1}, Slot 2 = {player.item2}")
+
+
                 else:
                     print("⚠️ Not enough gold!")
                     return None
 
-                return item_name  # ✅ Return purchased item
+                return item_data.item_name  # ✅ Use stored name instead of key
         return None  # ✅ Return None if no item was clicked
 
     def handle_click(self, pos):
@@ -204,13 +212,10 @@ class Dialog:
                 return option  # ✅ Return "Buy" or "Sell"
         return None  # ✅ Return None if no button was clicked
 
-
-    
     def draw2(self, screen, dialog_text):
-        
         """Draws the merchant wares with purchase buttons."""
         self.font = pygame.font.Font(None, 22)
-        panel_y = screen.get_height() - self.HEIGHT  
+        panel_y = screen.get_height() - self.HEIGHT
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
 
         # Display text
@@ -221,16 +226,16 @@ class Dialog:
             text_surface = self.font.render(line, True, self.TEXT_COLOR)
             screen.blit(text_surface, (10, y_offset))
 
-            # Draw Buy Button (for actual items)
-            if ":" in line:  # Ensures this line has an item to buy
-                item_name = line.split(":")[0].strip()
-                button_x = 400  
-                button_y = y_offset  
-                button_width = 80  
-                button_height = 30  
+            # Ensure this line has an item to buy
+            if ":" in line:
+                item_name = line.split(":")[0].strip()  # ✅ Extract exact item name
+                button_x = 400
+                button_y = y_offset
+                button_width = 80
+                button_height = 30
 
                 rect = pygame.Rect(button_x, button_y, button_width, button_height)
-                self.buttons[item_name] = rect  # Store button rect
+                self.buttons[item_name] = rect  # ✅ Store the full name (e.g., "Vorpal Blade")
 
                 # Change color if hovering
                 mouse_x, mouse_y = pygame.mouse.get_pos()

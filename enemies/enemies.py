@@ -2,6 +2,7 @@ import random
 import pygame
 import os
 
+
 # Enemy class
 class Enemies:
     def __init__(self, sprite_path, hitpoints, strength, loot, spawn, lettersprite, xp):
@@ -15,9 +16,9 @@ class Enemies:
         self.xp = xp
 
     def load_sprite(self):
-        """ Loads the sprite only after Pygame display is initialized """
+        """Loads the sprite only after Pygame display is initialized"""
         if self.sprite_path and not self.sprite:
-            if os.path.exists(self.sprite_path):  
+            if os.path.exists(self.sprite_path):
                 try:
                     self.sprite = pygame.image.load(self.sprite_path).convert_alpha()
                     print(f"Loaded sprite: {self.sprite_path}")
@@ -26,11 +27,13 @@ class Enemies:
             else:
                 print(f"Sprite file not found: {self.sprite_path}")
 
+
 # Dictionary to store enemy types
 ENEMIES_LIST = {
-    "orc": Enemies("sprites/orc.png",12, 5, 10, "grassland", "O",20),  
-    "troll": Enemies(None, 20, 10, 15, "hills", "T",30)  
+    "orc": Enemies("sprites/orc.png", 12, 5, 10, "grassland", "O", 20),
+    "troll": Enemies(None, 20, 10, 15, "hills", "T", 30),
 }
+
 
 # Function to spawn an enemy
 def spawnenemy(world_map, GRID_SIZE):
@@ -60,6 +63,7 @@ def spawnenemy(world_map, GRID_SIZE):
     # ✅ Load and return the enemy sprite instead of a letter
     enemy.load_sprite()  # Ensure sprite is loaded before use
     return enemy_x, enemy_y, enemy.sprite, enemy_type
+
 
 # Function to move enemy toward player
 def moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES):

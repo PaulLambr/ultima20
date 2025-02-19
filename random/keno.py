@@ -2,9 +2,11 @@ import random
 
 totalscore = 50  # Starting cash
 
+
 # Function to draw 4 random numbers
 def draw_numbers():
     return random.sample(range(1, 51), 4)
+
 
 # Calculate score based on matches
 def calculate_score(user_picks, drawn_numbers):
@@ -23,11 +25,14 @@ def calculate_score(user_picks, drawn_numbers):
     else:
         return 0  # No winnings for no matches
 
+
 # Validate user input
 def get_valid_picks():
     while True:
         try:
-            picks = input("\nPick 4 numbers between 1 and 50 (comma-separated): ").split(",")
+            picks = input(
+                "\nPick 4 numbers between 1 and 50 (comma-separated): "
+            ).split(",")
             picks = list(map(int, picks))  # Convert to integers
             if len(picks) != 4:
                 raise ValueError("You must pick exactly 4 numbers.")
@@ -38,6 +43,7 @@ def get_valid_picks():
             return picks
         except ValueError as e:
             print(f"Invalid input: {e}")
+
 
 # Main game logic
 def play_game():
@@ -77,6 +83,7 @@ def play_game():
         if play_again != "y":
             print(f"\nThanks for playing! You walk away with: ${totalscore}.")
             break
+
 
 # Play the game
 play_game()

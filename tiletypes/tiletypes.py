@@ -4,30 +4,31 @@ import os
 
 class Tile:
     def __init__(self, sprite_path, background, color, passable):
-        self.passable = passable  
-        self.color = color  
+        self.passable = passable
+        self.color = color
         self.sprite_path = sprite_path  # Store path but don't load immediately
         self.sprite = None  # Delay sprite loading
         self.background = background
         self.background2 = None
-        
 
     def load_background(self):
-        """ Loads the sprite only after Pygame display is initialized """
+        """Loads the sprite only after Pygame display is initialized"""
         if self.background and not self.background2:
-            if os.path.exists(self.background):  
+            if os.path.exists(self.background):
                 try:
-                    self.background2 = pygame.image.load(self.background).convert_alpha()
-                    #print(f"Loaded sprite: {self.background}")
+                    self.background2 = pygame.image.load(
+                        self.background
+                    ).convert_alpha()
+                    # print(f"Loaded sprite: {self.background}")
                 except pygame.error as e:
                     print(f"Error loading {self.background}: {e}")
             else:
                 print(f"Sprite file not found: {self.background}")
 
     def load_sprite(self):
-        """ Loads the sprite only after Pygame display is initialized """
+        """Loads the sprite only after Pygame display is initialized"""
         if self.sprite_path and not self.sprite:
-            if os.path.exists(self.sprite_path):  
+            if os.path.exists(self.sprite_path):
                 try:
                     self.sprite = pygame.image.load(self.sprite_path).convert_alpha()
                     print(f"Loaded sprite: {self.sprite_path}")
@@ -46,8 +47,6 @@ class Tile:
         self.load_background()  # Force the update
 
 
-
-
 # ✅ Dictionary to store tile types, but sprites are not loaded yet
 TILE_TYPES = {
     "grassland": Tile(None, "sprites/grassland.png", (34, 139, 34), True),
@@ -56,5 +55,5 @@ TILE_TYPES = {
     "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True),
     "avatar": Tile("sprites/avatar.png", None, (128, 128, 128), False),
     "britannia": Tile("sprites/castle.png", None, (128, 128, 128), True),
-    "merchant": Tile("sprites/avatar.png", None, (128, 128, 128), False)
+    "merchant": Tile("sprites/avatar.png", None, (128, 128, 128), False),
 }

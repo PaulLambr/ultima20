@@ -2,7 +2,7 @@ import pygame
 import random
 
 pygame.init()
-pygame.font.init() 
+pygame.font.init()
 
 # ✅ Set up the display *before* loading images
 TILE_SIZE = 50
@@ -25,6 +25,7 @@ from utils import returntomap, openchest
 from gamestate import player, ui_panel, PlayerStats
 from enemies.enemies import ENEMIES_LIST
 from britannia import britannia_castle
+
 for tile in TILE_TYPES.values():
     tile.load_sprite()
     tile.load_background()
@@ -49,7 +50,9 @@ player_x, player_y = 0, 0
 player_level = 1
 restore_x, restore_y = player_x, player_y  # Ensure it's initialized
 player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar
-player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+player_sprite = pygame.transform.scale(
+    player_sprite, (TILE_SIZE, TILE_SIZE)
+)  # Scale to fit tiles
 
 
 # Enemy tracking variables (initialized as None)
@@ -75,16 +78,14 @@ while running:
 
         # Detect single key press event (not continuous holding)
         if event.type == pygame.MOUSEBUTTONDOWN:
-                selected_action = ui_panel.handle_click(event.pos)  # Get action
-            
-                if selected_action == "Use" and player.potions:
-                    redraw_needed = True
-                    ui_panel.usepotion(player)  # ✅ Correct
+            selected_action = ui_panel.handle_click(event.pos)  # Get action
 
+            if selected_action == "Use" and player.potions:
+                redraw_needed = True
+                ui_panel.usepotion(player)  # ✅ Correct
 
         if event.type == pygame.KEYDOWN:
             new_x, new_y = player_x, player_y
-
 
             if event.key == pygame.K_LEFT and player_x > 0:
                 new_x -= 1
@@ -95,17 +96,18 @@ while running:
             if event.key == pygame.K_DOWN and player_y < GRID_SIZE - 1:
                 new_y += 1
 
-            
             if event.key == pygame.K_o:  # Enter open chest mode
-                open_mode = True  
-                pending_open = None  
+                open_mode = True
+                pending_open = None
                 print("🔓 Open mode activated. Press a direction key.")
-                continue  
+                continue
 
-            if open_mode:  # If "O" was pressed, register the next key as chest direction
-                pending_open = event.key  
-                open_mode = False  
-            
+            if (
+                open_mode
+            ):  # If "O" was pressed, register the next key as chest direction
+                pending_open = event.key
+                open_mode = False
+
                 # Determine chest location
                 open_x, open_y = player_x, player_y
                 if pending_open == pygame.K_LEFT:
@@ -117,12 +119,23 @@ while running:
                 elif pending_open == pygame.K_DOWN:
                     open_y += 1
 
-            # Ensure within bounds and process chest
+                # Ensure within bounds and process chest
                 if 0 <= open_x < GRID_SIZE and 0 <= open_y < GRID_SIZE:
-                    current_tile = world_map[player_y][player_x]  # ✅ Capture the current tile type
+                    current_tile = world_map[player_y][
+                        player_x
+                    ]  # ✅ Capture the current tile type
                     print(f"\nBefore calling openchest, current_tile = {current_tile}")
-                    openchest(player_x, player_y, pending_open, world_map, GRID_SIZE, ENEMIES_LIST, enemy_type, ui_panel, current_tile)
-
+                    openchest(
+                        player_x,
+                        player_y,
+                        pending_open,
+                        world_map,
+                        GRID_SIZE,
+                        ENEMIES_LIST,
+                        enemy_type,
+                        ui_panel,
+                        current_tile,
+                    )
 
             # Check if new position is passable
             if TILE_TYPES[world_map[new_y][new_x]].passable:
@@ -134,39 +147,49 @@ while running:
 
                 # Move the enemy towards the player
                 if enemy_present and enemy_x is not None and enemy_y is not None:
-                    enemy_x, enemy_y = moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES)
+                    enemy_x, enemy_y = moveenemy(
+                        enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES
+                    )
 
                     # game.py
                     if enemy_x == player_x and enemy_y == player_y:
                         restore_x, restore_y = player_x, player_y  # Save position
                         tile_type = world_map[player_y][player_x]
-                        player_level=player.level
+                        player_level = player.level
                         print(f"\n before combat is called tile_type is {tile_type}")
-                        combat(player_level, tile_type,enemy_type)  # Start battle
+                        combat(player_level, tile_type, enemy_type)  # Start battle
 
-                    # Restore position after combat
-                        returned_position = returntomap(player_x, player_y, restore_x, restore_y)
+                        # Restore position after combat
+                        returned_position = returntomap(
+                            player_x, player_y, restore_x, restore_y
+                        )
                         if returned_position:
                             player_x, player_y = returned_position
                         else:
                             player_x, player_y = restore_x, restore_y
-                        
+
                         world_map[restore_y][restore_x] = "chest"
                         # ✅ Apply the correct background to the chest
-                        TILE_TYPES["chest"].background = TILE_TYPES[tile_type].background
-                        TILE_TYPES["chest"].background2 = None  # Reset previous background
-                        TILE_TYPES["chest"].load_background()  # Reload with new background
+                        TILE_TYPES["chest"].background = TILE_TYPES[
+                            tile_type
+                        ].background
+                        TILE_TYPES["chest"].background2 = (
+                            None  # Reset previous background
+                        )
+                        TILE_TYPES[
+                            "chest"
+                        ].load_background()  # Reload with new background
 
                         redraw_needed = True
 
-
-                    # Reinitialize UI and screen
-                        screen = pygame.display.set_mode((WIDTH, HEIGHT))  # Reset game window
+                        # Reinitialize UI and screen
+                        screen = pygame.display.set_mode(
+                            (WIDTH, HEIGHT)
+                        )  # Reset game window
                         pygame.display.set_caption("The Realm of Britannia")
                         ui_panel = UI(player)  # Reset UI panel
                         frame_counter = 0
                         enemy_present = False  # Enemy defeated, remove from overworld
-                
 
     # Spawn enemy every 60 frames
     frame_counter += 1
@@ -187,38 +210,53 @@ while running:
                 if world_map[row][col] == "chest":
                     print(f"Chest found at ({col}, {row}) in world_map")
                 tile_type = world_map[row][col]
-                #print(f"\ntile type is {tile_type} when drawing map")
+                # print(f"\ntile type is {tile_type} when drawing map")
                 tile = TILE_TYPES[tile_type]
                 if tile.background2:
-                    background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
-                    screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
+                    background_scaled = pygame.transform.scale(
+                        tile.background2, (TILE_SIZE, TILE_SIZE)
+                    )  # Ensure correct size
+                    screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE))
                 else:
-                    pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-                
-        # ✅ Then layer the sprite on top if it exists
+                    pygame.draw.rect(
+                        screen,
+                        tile.color,
+                        (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                    )
+
+                # ✅ Then layer the sprite on top if it exists
                 if tile.sprite:
                     current_tile2 = world_map[player_y][player_x]
                     tile.getbg(current_tile2)
                     redraw_needed = True
-                    
-                    if tile.background2:
-                        background_scaled = pygame.transform.scale(tile.background2, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
-                        screen.blit(background_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
-                    else:
-                        pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
-                    sprite_scaled = pygame.transform.scale(tile.sprite, (TILE_SIZE, TILE_SIZE))  # Ensure correct size
-                    screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE)) 
 
-    
+                    if tile.background2:
+                        background_scaled = pygame.transform.scale(
+                            tile.background2, (TILE_SIZE, TILE_SIZE)
+                        )  # Ensure correct size
+                        screen.blit(
+                            background_scaled, (col * TILE_SIZE, row * TILE_SIZE)
+                        )
+                    else:
+                        pygame.draw.rect(
+                            screen,
+                            tile.color,
+                            (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                        )
+                    sprite_scaled = pygame.transform.scale(
+                        tile.sprite, (TILE_SIZE, TILE_SIZE)
+                    )  # Ensure correct size
+                    screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE))
+
         # Draw player sprite at the player's position
         screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-
-       # Draw enemy if present
+        # Draw enemy if present
         if enemy_present and enemy_sprite:
-            enemy_scaled = pygame.transform.scale(enemy_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+            enemy_scaled = pygame.transform.scale(
+                enemy_sprite, (TILE_SIZE, TILE_SIZE)
+            )  # Scale to fit tiles
             screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))
-
 
         # Draw UI Panel (Stats)
         ui_panel.draw(screen)

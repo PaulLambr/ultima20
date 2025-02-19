@@ -19,9 +19,7 @@ pygame.display.set_caption("Move 'A' on a 15x15 Tile Map")
 clock = pygame.time.Clock()  # Controls frame rate
 
 # Sample 15x15 map using tile type keys
-world_map = [
-    ["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)
-]
+world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 
 # Add some rocks manually for testing (impassable areas)
 world_map[3][3] = "rock"
@@ -40,25 +38,28 @@ enemy_x, enemy_y = None, None
 enemy_type = None
 enemy_sprite = None
 
+
 # Enemy class
 class Enemies:
     def __init__(self, hitpoints, strength, loot, spawn, lettersprite):
-        self.hitpoints = hitpoints  
+        self.hitpoints = hitpoints
         self.strength = strength
         self.loot = loot
         self.spawn = spawn
         self.lettersprite = lettersprite
 
+
 # Dictionary to store enemy types
 ENEMIES_LIST = {
-    "orc": Enemies(25, 10, 10, "grassland", "O"),  
-    "troll": Enemies(35, 20, 15, "hills", "T")  
+    "orc": Enemies(25, 10, 10, "grassland", "O"),
+    "troll": Enemies(35, 20, 15, "hills", "T"),
 }
+
 
 # Function to spawn an enemy
 def spawnenemy():
     global enemy_present, enemy_x, enemy_y, enemy_type, enemy_sprite
-    
+
     if enemy_present:
         return  # Don't spawn if an enemy is already on the map
 
@@ -85,6 +86,7 @@ def spawnenemy():
 
     enemy_sprite = ENEMIES_LIST[enemy_type].lettersprite
     enemy_present = True  # Mark that an enemy exists
+
 
 # Game loop
 running = True
@@ -131,7 +133,11 @@ while running:
             for col in range(GRID_SIZE):
                 tile_type = world_map[row][col]
                 tile = TILE_TYPES[tile_type]
-                pygame.draw.rect(screen, tile.color, (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+                pygame.draw.rect(
+                    screen,
+                    tile.color,
+                    (col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE),
+                )
 
         # Draw 'A' at the player's position
         font = pygame.font.Font(None, 50)
