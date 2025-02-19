@@ -55,7 +55,10 @@ TILE_TYPES = {
     "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True),
     "avatar": Tile("sprites/avatar.png", None, (128, 128, 128), False),
     "britannia": Tile("sprites/castle.png", None, (128, 128, 128), True),
-    "merchant": Tile("sprites/merchant.png", "sprites/bricks.png", (139, 69, 19), False),
-    "bricks": Tile(None, "sprites/bricks.png", (128, 128, 128), True)
+    "merchant": Tile("sprites/merchant.png", None, (165, 42, 42), False),
+    "bricks": Tile(None, "sprites/bricks.png", (128, 128, 128), True),
+    "weaponshoppe": Tile("sprites/weaponshoppe.png", "sprites/bricks.png", (165, 42, 42), False),
+    "arch": Tile("sprites/arch.png", "sprites/bricks.png", (165, 42, 42), True),
+    "castle_stone": Tile(None, "sprites/castle_stone.png", (128, 128, 128), False)
     
 }

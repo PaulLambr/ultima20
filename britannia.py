@@ -34,12 +34,25 @@ def britannia_castle():
     pygame.display.set_caption("Welcome to Britannia Castle!")
 
     # Generate castle grid
+    
     castle_map = [["bricks"] * CASTLE_GRID_SIZE_X for _ in range(CASTLE_GRID_SIZE_Y)]
-    castle_map[2][3] = "merchant"
-    castle_map[9][9] = "hills"
+    
+    
+    
+   
+    for row in range(12):  # Left and right borders
+        castle_map[row][14] = "castle_stone"
+        castle_map[row][0] = "castle_stone"
+    
+    for col in range(15):  # Top and bottom borders
+        castle_map[11][col] = "castle_stone"
+    
+    castle_map[0][2] = "weaponshoppe"
+    castle_map[1][2] = "merchant"
+    castle_map[11][8] = "arch"
 
     # Player starts in the center
-    player_x, player_y = 7, 7
+    player_x, player_y = 8, 10
     merchant_mode = False
 
     running = True
@@ -104,11 +117,23 @@ def britannia_castle():
                     if TILE_TYPES[castle_map[new_y][new_x]].passable:
                         player_x, player_y = new_x, new_y
 
-                    if new_x == 9 and new_y == 9:
+                    if new_x == 8 and new_y == 11:
                         print("Returning to the overworld...")
                         return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                selected_action = ui_panel.handle_click(event.pos)  # Get action
+
+                if selected_action == "Use" and player.potions:
+                    #redraw_needed = True
+                    ui_panel.usepotion(player)  # ✅ Correct
+                
+                elif selected_action and "Equip_" in selected_action:
+                    ui_panel.equip_item(event.pos, player)  # ✅ Equip item logic triggered
+                    ui_panel.update_stats(player)  # ✅ Refresh UI
+
+                elif selected_action == "Drop":
+                    print("Drop button clicked!")
                 if show_dialog:
                     selected_action = dialog_panel.handle_click(
                         event.pos

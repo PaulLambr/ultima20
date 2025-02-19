@@ -250,7 +250,7 @@ def enemy_attack(enemy_list, enemy_index, player_x, player_y):
     if (abs(enemy_x - player_x) == 1 and enemy_y == player_y) or (
         abs(enemy_y - player_y) == 1 and enemy_x == player_x
     ):
-        enemy_damage = (
+        enemy_damage = round(
             random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength
         )
         player.hitpoints -= enemy_damage

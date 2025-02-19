@@ -93,6 +93,14 @@ while running:
             if selected_action == "Use" and player.potions:
                 redraw_needed = True
                 ui_panel.usepotion(player)  # ✅ Correct
+                
+            elif selected_action and "Equip_" in selected_action:
+                redraw_needed = True
+                ui_panel.equip_item(event.pos, player)  # ✅ Equip item logic triggered
+                ui_panel.update_stats(player)  # ✅ Refresh UI
+
+            elif selected_action == "Drop":
+                print("Drop button clicked!")
 
         if event.type == pygame.KEYDOWN:
             new_x, new_y = player_x, player_y

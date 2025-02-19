@@ -57,9 +57,9 @@ class PlayerStats:
 # Initialize Player Stats
 player = PlayerStats(
     level=1,
-    hitpoints=random.randint(20, 30),
+    hitpoints=random.randint(25, 35),
     strength=random.randint(5, 10),
-    gold=0,
+    gold=20,
     xp=0,
     weapon="Fists",
     armor="Furs",
