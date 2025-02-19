@@ -50,10 +50,10 @@ def openchest(
 
             # Determine loot amount
             if enemy_type and enemy_type in ENEMIES_LIST:
-                loot_factor = ENEMIES_LIST[enemy_type].loot  # Use .loot directly
+                loot_factor = ENEMIES_LIST[enemy_type].loot * player.level # Use .loot directly
             else:
                 loot_factor = 5  # Default loot if no enemy
-            loot_amount = random.randint(1, 2) * loot_factor
+            loot_amount = random.uniform(1, 2) * loot_factor
             player.gold += loot_amount
 
             # ✅ Replace the chest with the original terrain

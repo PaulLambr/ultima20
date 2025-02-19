@@ -11,7 +11,7 @@ level3done = False
 
 class PlayerStats:
     def __init__(
-        self, level, hitpoints, strength, gold, xp, weapon, armor, potions, item1, item2
+        self, level, hitpoints, strength, gold, xp, weapon, armor, potions, item1, item2, item3, item4, item5
     ):
         self.level = level
         self.hitpoints = hitpoints
@@ -23,6 +23,10 @@ class PlayerStats:
         self.potions = potions
         self.item1 = item1
         self.item2 = item2
+        self.item3 = item3
+        self.item4 = item4
+        self.item5 = item5
+        
 
     def levelup(self):
         global level1done, level2done, level3done
@@ -53,15 +57,18 @@ class PlayerStats:
 # Initialize Player Stats
 player = PlayerStats(
     level=1,
-    hitpoints=random.randint(80, 90),
+    hitpoints=random.randint(20, 30),
     strength=random.randint(5, 10),
-    gold=500,
+    gold=0,
     xp=0,
-    weapon="Shiv",
-    armor="Fur",
-    potions=3,
+    weapon="Fists",
+    armor="Furs",
+    potions=1,
     item1=0,
     item2=0,
+    item3=0,
+    item4=0,
+    item5=0
 )
 
 # Initialize UI Panel

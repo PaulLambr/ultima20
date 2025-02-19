@@ -5,9 +5,10 @@ from tiletypes.tiletypes import TILE_TYPES
 from utils import returntomap
 from ui import UI
 from gamestate import player, ui_panel, PlayerStats
+import merchantwares
 
 # Constants for Battle Screen
-BATTLE_GRID_SIZE = 12
+BATTLE_GRID_SIZE = 15
 TILE_SIZE = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -20,7 +21,9 @@ restore_x, restore_y = player_x, player_y
 
 
 def combat(player_level, tile_type, enemy_type):
-    global attack_mode, pending_attack
+    global attack_mode, pending_attack, ui_panel
+    ...
+    ui_panel = UI(player)  # ✅ Reset UI panel when entering battle
     player_sprite = pygame.image.load(
         "sprites/avatar.png"
     ).convert_alpha()  # Load avatar
@@ -73,6 +76,20 @@ def combat(player_level, tile_type, enemy_type):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                selected_action = ui_panel.handle_click(event.pos)  # ✅ Handle UI clicks
+
+                if selected_action == "Use" and player.potions:
+                    ui_panel.usepotion(player)  # ✅ Use potion
+                    ui_panel.update_stats(player)  # ✅ Update UI panel
+
+                elif selected_action and "Equip_" in selected_action:
+                    ui_panel.equip_item(event.pos, player)  # ✅ Equip item logic triggered
+                    ui_panel.update_stats(player)  # ✅ Refresh UI
+
+                elif selected_action == "Drop":
+                    print("Drop button clicked!")
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:  # Enter attack mode
@@ -176,7 +193,8 @@ def combat(player_level, tile_type, enemy_type):
         # Draw the screen
         screen.fill(BLACK)
 
-        ui_panel.draw(screen)
+        #ui_panel.draw(screen)
+    
 
         for row in range(BATTLE_GRID_SIZE):
             for col in range(BATTLE_GRID_SIZE):
@@ -210,7 +228,7 @@ def combat(player_level, tile_type, enemy_type):
                 screen.blit(enemy_scaled, (ex * TILE_SIZE, ey * TILE_SIZE))
             else:
                 print(f"⚠️ Warning: No sprite found for enemy type '{et}'")
-
+        ui_panel.draw(screen) 
         pygame.display.update()
 
         # If all enemies are dead, return to world map
@@ -309,7 +327,11 @@ def damage(enemy_index, enemy_list):
     """
     Reduces enemy hitpoints and removes the enemy if they are defeated.
     """
-    enemy_damage = random.uniform(1, 2) * player.strength
+    weapon_key = player.weapon.lower()  # ✅ Convert to lowercase to match dictionary keys
+    weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)  # ✅ Retrieve weapon object
+    weaponcoeff = weapon_data.damage if weapon_data else 0  # ✅ Default to 0 if no weapon found
+
+    enemy_damage = random.uniform(1, 2) * (player.strength + weaponcoeff)
     enemy_list[enemy_index][4] -= enemy_damage
     print(
         f"\n You scored {enemy_damage} points against {enemy_list[enemy_index][4]} enemy hp."

@@ -30,8 +30,8 @@ class Enemies:
 
 # Dictionary to store enemy types
 ENEMIES_LIST = {
-    "orc": Enemies("sprites/orc.png", 12, 5, 10, "grassland", "O", 20),
-    "troll": Enemies(None, 20, 10, 15, "hills", "T", 30),
+    "orc": Enemies("sprites/orc.png", 15, 3, 10, "grassland", "O", 20),
+    "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 30),
 }
 
 

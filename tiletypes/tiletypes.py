@@ -50,10 +50,12 @@ class Tile:
 # ✅ Dictionary to store tile types, but sprites are not loaded yet
 TILE_TYPES = {
     "grassland": Tile(None, "sprites/grassland.png", (34, 139, 34), True),
-    "rock": Tile(None, None, (128, 128, 128), False),
-    "hills": Tile(None, "sprites/hills.png", (255, 165, 0), True),
+    "rock": Tile("sprites/mountain.png", "sprites/grassland.png", (128, 128, 128), False),
+    "hills": Tile(None, "sprites/hills.png", (34, 139, 34), True),
     "chest": Tile("sprites/chest_trans.png", None, (139, 69, 19), True),
     "avatar": Tile("sprites/avatar.png", None, (128, 128, 128), False),
     "britannia": Tile("sprites/castle.png", None, (128, 128, 128), True),
-    "merchant": Tile("sprites/avatar.png", None, (128, 128, 128), False),
+    "merchant": Tile("sprites/merchant.png", "sprites/bricks.png", (139, 69, 19), False),
+    "bricks": Tile(None, "sprites/bricks.png", (128, 128, 128), True)
+    
 }

@@ -7,7 +7,7 @@ pygame.font.init()
 # ✅ Set up the display *before* loading images
 TILE_SIZE = 50
 GRID_SIZE = 15  # 15x15 map
-WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + 250, TILE_SIZE * GRID_SIZE  # UI width = 300
+WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + 400, TILE_SIZE * GRID_SIZE  # UI width = 300
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 SPAWN_INTERVAL = 200  # Frames per spawn attempt
@@ -34,19 +34,29 @@ for tile in TILE_TYPES.values():
 world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 
 # Add some rocks manually for testing (impassable areas)
-world_map[3][3] = "rock"
-world_map[5][6] = "rock"
-world_map[7][7] = "rock"
+
 world_map[7][10] = "britannia"
-world_map[10][10] = "rock"
-world_map[12][14] = "hills"
-world_map[14][14] = "hills"
-world_map[13][14] = "hills"
-world_map[11][14] = "hills"
-world_map[10][14] = "hills"
+
+
+# Two rows of hills along the other 3 sides
+for col in range(15):  # Top and bottom borders
+    world_map[1][col] = "hills"
+    world_map[14][col] = "hills"
+    world_map[2][col] = "hills"
+    world_map[13][col] = "hills"
+
+for row in range(15):  # Left and right borders
+    
+    world_map[row][14] = "hills"
+    
+    world_map[row][13] = "hills"
+    
+# Wall of rocks along row 1
+for col in range(15):
+    world_map[0][col] = "rock"
 
 # Player starting position
-player_x, player_y = 0, 0
+player_x, player_y = 2,3
 player_level = 1
 restore_x, restore_y = player_x, player_y  # Ensure it's initialized
 player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar
@@ -179,16 +189,17 @@ while running:
                         TILE_TYPES[
                             "chest"
                         ].load_background()  # Reload with new background
-
-                        redraw_needed = True
-
+                        
                         # Reinitialize UI and screen
+                        redraw_needed = True
                         screen = pygame.display.set_mode(
                             (WIDTH, HEIGHT)
                         )  # Reset game window
                         pygame.display.set_caption("The Realm of Britannia")
                         ui_panel = UI(player)  # Reset UI panel
+                        
                         frame_counter = 0
+                        
                         enemy_present = False  # Enemy defeated, remove from overworld
 
     # Spawn enemy every 60 frames

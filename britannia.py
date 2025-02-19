@@ -7,7 +7,8 @@ from merchantwares import MerchantWares  # Import it properly
 
 
 # Constants for Battle Screen
-CASTLE_GRID_SIZE = 13
+CASTLE_GRID_SIZE_X = 15
+CASTLE_GRID_SIZE_Y = 12
 TILE_SIZE = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -26,16 +27,16 @@ def britannia_castle():
     player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))
 
     WIDTH, HEIGHT = (
-        TILE_SIZE * CASTLE_GRID_SIZE + ui_panel.WIDTH,
-        TILE_SIZE * CASTLE_GRID_SIZE + dialog_panel.HEIGHT,
+        TILE_SIZE * CASTLE_GRID_SIZE_X + ui_panel.WIDTH,
+        TILE_SIZE * CASTLE_GRID_SIZE_Y + dialog_panel.HEIGHT,
     )
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Welcome to Britannia Castle!")
 
     # Generate castle grid
-    castle_map = [["grassland"] * CASTLE_GRID_SIZE for _ in range(CASTLE_GRID_SIZE)]
-    castle_map[7][7] = "hills"
+    castle_map = [["bricks"] * CASTLE_GRID_SIZE_X for _ in range(CASTLE_GRID_SIZE_Y)]
     castle_map[2][3] = "merchant"
+    castle_map[9][9] = "hills"
 
     # Player starts in the center
     player_x, player_y = 7, 7
@@ -76,8 +77,8 @@ def britannia_castle():
 
                     # Ensure within bounds
                     if (
-                        0 <= talk_x < CASTLE_GRID_SIZE
-                        and 0 <= talk_y < CASTLE_GRID_SIZE
+                        0 <= talk_x < CASTLE_GRID_SIZE_X
+                        and 0 <= talk_y < CASTLE_GRID_SIZE_Y
                     ):
                         show_dialog, dialog_text = talk(
                             player_x, player_y, pending_talk, castle_map
@@ -93,17 +94,17 @@ def britannia_castle():
 
                     if event.key == pygame.K_LEFT and player_x > 0:
                         new_x -= 1
-                    if event.key == pygame.K_RIGHT and player_x < CASTLE_GRID_SIZE - 1:
+                    if event.key == pygame.K_RIGHT and player_x < CASTLE_GRID_SIZE_X - 1:
                         new_x += 1
                     if event.key == pygame.K_UP and player_y > 0:
                         new_y -= 1
-                    if event.key == pygame.K_DOWN and player_y < CASTLE_GRID_SIZE - 1:
+                    if event.key == pygame.K_DOWN and player_y < CASTLE_GRID_SIZE_Y - 1:
                         new_y += 1
 
                     if TILE_TYPES[castle_map[new_y][new_x]].passable:
                         player_x, player_y = new_x, new_y
 
-                    if new_x == 7 and new_y == 7:
+                    if new_x == 9 and new_y == 9:
                         print("Returning to the overworld...")
                         return
 
@@ -141,8 +142,8 @@ def britannia_castle():
         screen.fill(BLACK)
         ui_panel.draw(screen)
 
-        for row in range(CASTLE_GRID_SIZE):
-            for col in range(CASTLE_GRID_SIZE):
+        for row in range(CASTLE_GRID_SIZE_Y):
+            for col in range(CASTLE_GRID_SIZE_X):
                 tile_type = castle_map[row][col]
                 tile = TILE_TYPES[tile_type]
 

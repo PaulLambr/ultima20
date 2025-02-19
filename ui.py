@@ -1,11 +1,10 @@
 import pygame
 import merchantwares  # ✅ Import the module itself, not specific items
 
-
 class UI:
     def __init__(self, player):
         self.player = player
-        self.WIDTH = 250  # Panel width
+        self.WIDTH = 400  # Panel width
         self.HEIGHT = 800  # Panel height
         self.BACKGROUND_COLOR = (50, 50, 50)  # Dark gray panel
         self.TEXT_COLOR = (255, 255, 255)  # White text
@@ -15,14 +14,16 @@ class UI:
         self.button_color = (100, 100, 255)
         self.button_hover_color = (150, 150, 255)
         self.button_text_color = (255, 255, 255)
-        self.buttons = {}  # Store button rects
+        self.buttons = {}  # ✅ Store button rects to persist between frames
 
     def draw(self, screen):
         """Draws the stats panel on the right side of the game window."""
         panel_x = screen.get_width() - self.WIDTH
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (panel_x, 0, self.WIDTH, self.HEIGHT))
+        stat_font = pygame.font.Font(None, 30)   # Font for stats
+        button_font = pygame.font.Font(None, 20) # Smaller font for buttons
 
-        # Display Player Stats
+        # ✅ Display Player Stats
         stats = [
             f"Level: {self.player.level}",
             f"HP: {self.player.hitpoints}",
@@ -34,66 +35,57 @@ class UI:
             f"Salves: {self.player.potions}",
             f"Item 1: {self.player.item1}",
             f"Item 2: {self.player.item2}",
+            f"Item 3: {self.player.item3}",
+            f"Item 4: {self.player.item4}",
+            f"Item 5: {self.player.item5}",
         ]
 
         y_offset = 20
         for stat in stats:
-            self.font = pygame.font.Font(None, 30)
-            text_surface = self.font.render(stat, True, self.TEXT_COLOR)
+            text_surface = stat_font.render(stat, True, self.TEXT_COLOR)
             screen.blit(text_surface, (panel_x + 10, y_offset))
-            y_offset += 40
 
-        # Draw buttons (Equip, Drop)
-        self.buttons = {}  # Reset button storage
-        self.font = pygame.font.Font(None, 15)
-        button_x = 910
-        button_y = 355 # Position buttons at the bottom of the panel
-        button_width = 35
-        button_height = 20
-        spacing = 10
+            # ✅ If the stat represents an item, create Equip & Drop buttons
+            if "Item" in stat:
+                item_slot = stat.split(":")[0].strip()  # Extract "Item 1", "Item 2", etc.
 
-        for option in ["Equip", "Drop"]:
-            rect = pygame.Rect(button_x, button_y, button_width, button_height)
-            self.buttons[option] = rect  # Store button rect
+                # Equip button
+                equip_rect = pygame.Rect(panel_x + 250, y_offset, 50, 25)
+                self.buttons[f"Equip_{item_slot}"] = equip_rect  # ✅ Store button
 
-            # Change color if hovering
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            if rect.collidepoint(mouse_x, mouse_y):
-                pygame.draw.rect(screen, self.button_hover_color, rect)
-            else:
-                pygame.draw.rect(screen, self.button_color, rect)
+                # Drop button
+                drop_rect = pygame.Rect(panel_x + 320, y_offset, 50, 25)
+                self.buttons[f"Drop_{item_slot}"] = drop_rect  # ✅ Store button
 
-            # Draw text
-            text_surface = self.font.render(option, True, self.button_text_color)
-            screen.blit(text_surface, (button_x + 5, button_y + 5))
+                # ✅ Draw buttons
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                for rect, text in [(equip_rect, "Equip"), (drop_rect, "Drop")]:
+                    color = self.button_hover_color if rect.collidepoint(mouse_x, mouse_y) else self.button_color
+                    pygame.draw.rect(screen, color, rect)
 
-            button_x += button_width + spacing  # Move to the right for next button
+                    # ✅ Use the smaller button font
+                    button_text_surface = button_font.render(text, True, self.button_text_color)
+                    screen.blit(button_text_surface, (rect.x + 5, rect.y + 5))
 
-        for option in ["Use"]:
-            button_x = 910
-            button_y = 300
-            rect = pygame.Rect(button_x, button_y, button_width, button_height)
-            self.buttons[option] = rect  # Store button rect
+            y_offset += 40  # Move down for the next stat
 
-            # Change color if hovering
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            if rect.collidepoint(mouse_x, mouse_y):
-                pygame.draw.rect(screen, self.button_hover_color, rect)
-            else:
-                pygame.draw.rect(screen, self.button_color, rect)
+        # ✅ "Use" Button for Potions
+        use_rect = pygame.Rect(1000, 297, 80, 30)
+        self.buttons["Use"] = use_rect  # Store button reference
 
-            # Draw text
-            text_surface = self.font.render(option, True, self.button_text_color)
-            screen.blit(text_surface, (button_x + 5, button_y + 5))
+        # Draw "Use" button
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        color = self.button_hover_color if use_rect.collidepoint(mouse_x, mouse_y) else self.button_color
+        pygame.draw.rect(screen, color, use_rect)
 
-            #button_x += button_width + spacing  # Move to the right for next button
-
+        text_surface = button_font.render("Use", True, self.button_text_color)
+        screen.blit(text_surface, (use_rect.x + 20, use_rect.y + 5))
 
     def handle_click(self, pos):
         """Detects if a button was clicked and returns action."""
-        for option, rect in self.buttons.items():
+        for button_name, rect in self.buttons.items():
             if rect.collidepoint(pos):
-                return option  # Return "Buy" or "Sell"
+                return button_name  # ✅ Return button name like "Equip_Item 1", "Use", etc.
         return None
 
     def update_stats(self, player):
@@ -101,12 +93,80 @@ class UI:
         self.player = player
 
     def usepotion(self, player):
+        """Uses a healing potion."""
         if player.potions > 0:
-            print("Using healing potion")  
-            player.hitpoints += 20
-            player.potions -= 1
-            self.update_stats(player)  # ✅ Update stats
-            
+            print("✅ Using healing potion")
+            player.hitpoints += 20  # ✅ Heal the player by 20 HP
+            player.potions -= 1  # ✅ Reduce potion count
+            self.update_stats(player)  # ✅ Update UI panel
+        else:
+            print("⚠️ No potions left!")
+
+    def equip_item(self, pos, player):
+        """Detects if an Equip button was clicked and equips the item."""
+        for button_name, rect in self.buttons.items():
+            if rect.collidepoint(pos) and "Equip_" in button_name:
+                item_slot = button_name.replace("Equip_", "").strip()
+                item_attr = item_slot.lower().replace(" ", "")
+                item_name = getattr(player, item_attr, None)
+
+                if not item_name:
+                    print(f"⚠️ No item found in {item_slot}")
+                    return None
+
+                merchant_key = item_name.lower()
+                if merchant_key not in merchantwares.MERCHANT_WARES:
+                    print(f"⚠️ Item '{item_name}' not found in merchantwares!")
+                    return None  
+
+                item_data = merchantwares.MERCHANT_WARES[merchant_key]
+
+                if item_data.isweapon:
+                    old_weapon = player.weapon  # ✅ Store current weapon
+                    player.weapon = item_name  # ✅ Equip new weapon
+                    
+                    print(f"✅ Equipped weapon: {item_name}")
+                    
+                    # ✅ Remove the equipped item from inventory
+                    if player.item1 == item_name:
+                        player.item1 = 0
+                    elif player.item2 == item_name:
+                        player.item2 = 0
+                    elif player.item3 == item_name:
+                        player.item3 = 0
+                    elif player.item4 == item_name:
+                        player.item4 = 0    
+                    elif player.item5 == item_name:
+                        player.item5 = 0
+
+                    # ✅ Store the old weapon in inventory (unless it's "Fists")
+                    if old_weapon and old_weapon.lower() != "fists" and old_weapon not in [
+                        player.item1, player.item2, player.item3, player.item4, player.item5
+                    ]:
+                        if not player.item1:
+                            player.item1 = old_weapon
+                        elif not player.item2:
+                            player.item2 = old_weapon
+                        elif not player.item3:
+                            player.item3 = old_weapon
+                        elif not player.item4:
+                            player.item4 = old_weapon
+                        elif not player.item5:
+                            player.item5 = old_weapon
+                        else:
+                            print(f"⚠️ No inventory space! {old_weapon} was dropped!")
+
+                elif item_data.isarmor:
+                    player.armor = item_name
+                    print(f"✅ Equipped armor: {item_name}")
+
+                else:
+                    print(f"⚠️ {item_name} is not equippable!")
+
+                self.update_stats(player)
+                return item_name
+
+        return None
 
 
 class Dialog:
@@ -214,12 +274,12 @@ class Dialog:
 
     def draw2(self, screen, dialog_text):
         """Draws the merchant wares with purchase buttons."""
-        self.font = pygame.font.Font(None, 22)
+        self.font = pygame.font.Font(None, 23)
         panel_y = screen.get_height() - self.HEIGHT
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
 
         # Display text
-        y_offset = panel_y + 20
+        y_offset = panel_y + 15
         self.buttons = {}  # Reset buttons
 
         for line in dialog_text:
@@ -248,4 +308,4 @@ class Dialog:
                 text_surface = self.font.render("Buy", True, self.button_text_color)
                 screen.blit(text_surface, (button_x + 20, button_y + 5))
 
-            y_offset += 25  # Move down for next item
+            y_offset += 31  # Move down for next item
