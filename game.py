@@ -186,8 +186,9 @@ while running:
                         else:
                             player_x, player_y = restore_x, restore_y
 
-                        world_map[restore_y][restore_x] = "chest"
-                        # ✅ Apply the correct background to the chest
+                        if world_map[restore_y][restore_x] != "britannia":
+                            
+                            world_map[restore_y][restore_x] = "chest"
                         TILE_TYPES["chest"].background = TILE_TYPES[
                             tile_type
                         ].background
