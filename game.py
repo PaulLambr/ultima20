@@ -139,10 +139,7 @@ while running:
 
                 # Ensure within bounds and process chest
                 if 0 <= open_x < GRID_SIZE and 0 <= open_y < GRID_SIZE:
-                    current_tile = world_map[player_y][
-                        player_x
-                    ]  # ✅ Capture the current tile type
-                    print(f"\nBefore calling openchest, current_tile = {current_tile}")
+                   
                     openchest(
                         player_x,
                         player_y,
@@ -152,7 +149,7 @@ while running:
                         ENEMIES_LIST,
                         enemy_type,
                         ui_panel,
-                        current_tile,
+                        chest_replacement_tiles
                     )
 
             # Check if new position is passable
@@ -186,8 +183,10 @@ while running:
                         else:
                             player_x, player_y = restore_x, restore_y
 
+                        chest_replacement_tiles = {}
                         if world_map[restore_y][restore_x] != "britannia":
                             
+                            chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
                             world_map[restore_y][restore_x] = "chest"
                         TILE_TYPES["chest"].background = TILE_TYPES[
                             tile_type
@@ -246,9 +245,7 @@ while running:
 
                 # ✅ Then layer the sprite on top if it exists
                 if tile.sprite:
-                    current_tile2 = world_map[player_y][player_x]
-                    tile.getbg(current_tile2)
-                    redraw_needed = True
+                    tile.background = TILE_TYPES[tile_type].background
 
                     if tile.background2:
                         background_scaled = pygame.transform.scale(

@@ -23,7 +23,7 @@ def openchest(
     ENEMIES_LIST,
     enemy_type,
     ui_panel,
-    current_tile,
+    chest_replacement_tiles
 ):
     """Handles opening chests adjacent to the player and granting rewards."""
     global redraw_needed
@@ -46,7 +46,7 @@ def openchest(
             print(f"✅ Chest detected at ({open_x}, {open_y})")
 
             # ✅ Store the current tile type before opening the chest
-            original_tile = current_tile  # Passed from game.py
+            original_tile = chest_replacement_tiles.get((open_x, open_y), "grassland")
 
             # Determine loot amount
             if enemy_type and enemy_type in ENEMIES_LIST:
@@ -62,6 +62,10 @@ def openchest(
                 f"✅ Chest removed. Tile at ({open_x}, {open_y}) is now '{original_tile}'."
             )
 
+            # ✅ Remove the entry from the dictionary
+            if (open_x, open_y) in chest_replacement_tiles:
+                del chest_replacement_tiles[(open_x, open_y)]
+                
             # ✅ Force redraw
             redraw_needed = True
 
