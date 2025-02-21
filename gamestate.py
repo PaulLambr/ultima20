@@ -11,10 +11,11 @@ level3done = False
 
 class PlayerStats:
     def __init__(
-        self, level, hitpoints, strength, gold, xp, weapon, armor, potions, item1, item2, item3, item4, item5
+        self, level, hitpoints, maxhp, strength, gold, xp, weapon, armor, potions, item1, item2, item3, item4, item5
     ):
         self.level = level
         self.hitpoints = hitpoints
+        self.maxhp = maxhp
         self.strength = strength
         self.gold = gold
         self.xp = xp
@@ -55,9 +56,12 @@ class PlayerStats:
 
 
 # Initialize Player Stats
+initial_hp=random.randint(25, 35)
+
 player = PlayerStats(
     level=1,
-    hitpoints=random.randint(25, 35),
+    hitpoints=initial_hp,
+    maxhp=initial_hp,
     strength=random.randint(5, 10),
     gold=20,
     xp=0,

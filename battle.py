@@ -2,7 +2,7 @@ import pygame
 import random
 from enemies.enemies import ENEMIES_LIST
 from tiletypes.tiletypes import TILE_TYPES
-from utils import returntomap
+from utils import returntomap, fled
 from ui import UI
 from gamestate import player, ui_panel, PlayerStats
 import merchantwares
@@ -20,8 +20,9 @@ player_x, player_y = 0, 0
 restore_x, restore_y = player_x, player_y
 
 
-def combat(player_level, tile_type, enemy_type):
+def combat(player_level, tile_type, enemy_type, winning):
     global attack_mode, pending_attack, ui_panel
+    winning = False
     ...
     ui_panel = UI(player)  # ✅ Reset UI panel when entering battle
     player_sprite = pygame.image.load(
@@ -47,7 +48,11 @@ def combat(player_level, tile_type, enemy_type):
     player_x, player_y = 6, 10
 
     # Determine the number of enemies based on player level
-    num_enemies = min(player_level, 5)
+    if (enemy_x, enemy_y) == "trollboss":
+        num_enemies = 8
+    else:
+        num_enemies = min(player_level, 5)
+    
     enemy_list = []
 
     for _ in range(num_enemies):
@@ -141,14 +146,16 @@ def combat(player_level, tile_type, enemy_type):
 
                 else:  # Player movement
                     new_x, new_y = player_x, player_y
-                    if event.key == pygame.K_LEFT and player_x > 0:
+                    if event.key == pygame.K_LEFT:
                         new_x -= 1
-                    if event.key == pygame.K_RIGHT and player_x < BATTLE_GRID_SIZE - 1:
+                    if event.key == pygame.K_RIGHT:
                         new_x += 1
-                    if event.key == pygame.K_UP and player_y > 0:
+                    if event.key == pygame.K_UP:
                         new_y -= 1
-                    if event.key == pygame.K_DOWN and player_y < BATTLE_GRID_SIZE - 1:
+                    if event.key == pygame.K_DOWN:
                         new_y += 1
+                        
+                
 
                     # ✅ Prevent player from moving onto an enemy's position
                     if (new_x, new_y) not in [
@@ -233,11 +240,20 @@ def combat(player_level, tile_type, enemy_type):
 
         # If all enemies are dead, return to world map
         if not enemy_list:
-            pygame.time.delay(500)  # Small delay before returning
-            returntomap(player_x, player_y, restore_x, restore_y)
-            break  # Exit the battle
+            print("✅ All enemies defeated! Returning to world map.")
+            winning = True
+            pygame.time.delay(500)
+            running = False  # Exit the battle loop
+        
+        
+        elif 0 > player_x or player_x > 15 or player_y < 0 or player_y > 15:
+            print("🚪 Player has escaped the battle.")
+            winning = False
+            pygame.time.delay(500)
+            running = False
+            
 
-    return
+    return winning
 
 
 def enemy_attack(enemy_list, enemy_index, player_x, player_y):
@@ -250,8 +266,12 @@ def enemy_attack(enemy_list, enemy_index, player_x, player_y):
     if (abs(enemy_x - player_x) == 1 and enemy_y == player_y) or (
         abs(enemy_y - player_y) == 1 and enemy_x == player_x
     ):
+        armor_key = player.armor.lower()  # ✅ Convert to lowercase to match dictionary keys
+        armor_data = merchantwares.MERCHANT_WARES.get(armor_key, None)  # ✅ Retrieve weapon object
+        armorcoeff = armor_data.protection if armor_data else 0  # ✅ Default to 0 if no weapon found
+        
         enemy_damage = round(
-            random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength
+            random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength - armorcoeff
         )
         player.hitpoints -= enemy_damage
         print(

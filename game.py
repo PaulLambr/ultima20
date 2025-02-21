@@ -21,7 +21,7 @@ from tiletypes.tiletypes import TILE_TYPES  # Import tile types
 from enemies.enemies import spawnenemy, moveenemy
 from battle import combat  # Import combat system
 from ui import UI
-from utils import returntomap, openchest
+from utils import returntomap, openchest, fled
 from gamestate import player, ui_panel, PlayerStats
 from enemies.enemies import ENEMIES_LIST
 from britannia import britannia_castle
@@ -69,6 +69,7 @@ player_sprite = pygame.transform.scale(
 enemy_present = False
 enemy_x, enemy_y, enemy_sprite = None, None, None
 enemy_type = None  # Ensure it's always defined
+winning = False
 
 
 # Game loop
@@ -172,32 +173,34 @@ while running:
                         tile_type = world_map[player_y][player_x]
                         player_level = player.level
                         print(f"\n before combat is called tile_type is {tile_type}")
-                        combat(player_level, tile_type, enemy_type)  # Start battle
+                        
+                        
+                        winning = combat(player_level, tile_type, enemy_type, winning)  
 
-                        # Restore position after combat
-                        returned_position = returntomap(
-                            player_x, player_y, restore_x, restore_y
-                        )
+                        # ✅ Restore position after combat
+                        returned_position = returntomap(player_x, player_y, restore_x, restore_y)
                         if returned_position:
                             player_x, player_y = returned_position
                         else:
                             player_x, player_y = restore_x, restore_y
 
-                        chest_replacement_tiles = {}
-                        if world_map[restore_y][restore_x] != "britannia":
+                            # ✅ If the player won, place the chest
+                        if winning:
+                            chest_replacement_tiles = {}
+                            if world_map[restore_y][restore_x] != "britannia":
+                                print(f"📦 Placing chest at ({restore_x}, {restore_y})")
+                                chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
+                                world_map[restore_y][restore_x] = "chest"
+                                TILE_TYPES["chest"].background = TILE_TYPES[
+                                    tile_type
+                                ].background
+                                TILE_TYPES["chest"].background2 = (
+                                    None  # Reset previous background
+                                )
+                                TILE_TYPES[
+                                    "chest"
+                                ].load_background()  # Reload with new background
                             
-                            chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
-                            world_map[restore_y][restore_x] = "chest"
-                        TILE_TYPES["chest"].background = TILE_TYPES[
-                            tile_type
-                        ].background
-                        TILE_TYPES["chest"].background2 = (
-                            None  # Reset previous background
-                        )
-                        TILE_TYPES[
-                            "chest"
-                        ].load_background()  # Reload with new background
-                        
                         # Reinitialize UI and screen
                         redraw_needed = True
                         screen = pygame.display.set_mode(
@@ -219,6 +222,7 @@ while running:
             enemy_present = True  # Enemy is now on the map
         frame_counter = 0
 
+    
     # Only redraw if necessary
     if redraw_needed:
         screen.fill(BLACK)
@@ -274,6 +278,8 @@ while running:
                 enemy_sprite, (TILE_SIZE, TILE_SIZE)
             )  # Scale to fit tiles
             screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))
+            
+                
 
         # Draw UI Panel (Stats)
         ui_panel.draw(screen)

@@ -32,6 +32,7 @@ class Enemies:
 ENEMIES_LIST = {
     "orc": Enemies("sprites/orc.png", 15, 3, 10, "grassland", "O", 20),
     "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 30),
+    "trollboss": Enemies("sprites/troll.png", 75, 12, 50, None, None, 75)
 }
 
 
@@ -50,6 +51,7 @@ def spawnenemy(world_map, GRID_SIZE):
         return None  # No valid spawn locations
 
     # Choose a random spawn location
+    
     enemy_y, enemy_x, tile_type = random.choice(spawnable_tiles)
 
     # Determine which enemy to spawn

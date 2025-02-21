@@ -96,7 +96,10 @@ class UI:
         """Uses a healing potion."""
         if player.potions > 0:
             print("✅ Using healing potion")
-            player.hitpoints += 20  # ✅ Heal the player by 20 HP
+
+            # ✅ Heal player but do not exceed max HP
+            player.hitpoints = min(player.hitpoints + 20, player.maxhp)
+
             player.potions -= 1  # ✅ Reduce potion count
             self.update_stats(player)  # ✅ Update UI panel
         else:
@@ -157,8 +160,39 @@ class UI:
                             print(f"⚠️ No inventory space! {old_weapon} was dropped!")
 
                 elif item_data.isarmor:
-                    player.armor = item_name
-                    print(f"✅ Equipped armor: {item_name}")
+                    old_armor = player.armor  # ✅ Store current weapon
+                    player.armor = item_name  # ✅ Equip new weapon
+                    
+                    print(f"✅ Equipped weapon: {item_name}")
+                    
+                    # ✅ Remove the equipped item from inventory
+                    if player.item1 == item_name:
+                        player.item1 = 0
+                    elif player.item2 == item_name:
+                        player.item2 = 0
+                    elif player.item3 == item_name:
+                        player.item3 = 0
+                    elif player.item4 == item_name:
+                        player.item4 = 0    
+                    elif player.item5 == item_name:
+                        player.item5 = 0
+
+                    # ✅ Store the old weapon in inventory (unless it's "Fists")
+                    if old_armor and old_armor.lower() != "furs" and old_armor not in [
+                        player.item1, player.item2, player.item3, player.item4, player.item5
+                    ]:
+                        if not player.item1:
+                            player.item1 = old_armor
+                        elif not player.item2:
+                            player.item2 = old_armor
+                        elif not player.item3:
+                            player.item3 = old_armor
+                        elif not player.item4:
+                            player.item4 = old_armor
+                        elif not player.item5:
+                            player.item5 = old_armor
+                        else:
+                            print(f"⚠️ No inventory space! {old_armor} was dropped!")
 
                 else:
                     print(f"⚠️ {item_name} is not equippable!")

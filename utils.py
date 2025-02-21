@@ -13,6 +13,11 @@ def returntomap(player_x, player_y, restore_x, restore_y):
     """
     return restore_x, restore_y  # Return new position
 
+def fled(player_x, player_y, restore_x, restore_y):
+    """
+    Restores the player's position after combat.
+    """
+    return restore_x, restore_y  # Return new position
 
 def openchest(
     player_x,
