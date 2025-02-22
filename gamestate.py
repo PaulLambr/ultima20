@@ -29,31 +29,35 @@ class PlayerStats:
         self.item5 = item5
         
 
-    def levelup(self):
+    def levelup(self, bosstrspawnf):
         global level1done, level2done, level3done
-        if self.xp >= 150 and level1done == False:  # Level up when XP reaches 100
+        if self.xp >= 125 and level1done == False:  # Level up when XP reaches 100
             self.level += 1
-            self.hitpoints += random.randint(5, 10)  # Increase HP
+            self.maxhp += random.randint(5, 10)  # Increase HP
+            self.hitpoints = self.maxhp
             self.strength += random.randint(1, 2)  # Increase Strength
             ui_panel.update_stats(player)
             level1done = True
         elif (
-            self.xp >= 300 and level1done == True and level2done == False
+            self.xp >= 450 and level1done == True and level2done == False
         ):  # Level up when XP reaches 100
             self.level += 1
-            self.hitpoints += random.randint(10, 20)  # Increase HP
-            self.strength += random.randint(1, 2)  # Increase Strength
+            self.maxhp += random.randint(10, 20)  # Increase HP
+            self.hitpoints = self.maxhp
+            self.strength += random.randint(2, 3)  # Increase Strength
             ui_panel.update_stats(player)
             level2done = True
         elif (
-            self.xp >= 1000 and level1done and level2done and not level3done
+            self.xp >= 1500 and level1done and level2done and not level3done
         ):  # Level up when XP reaches 100
             self.level += 1
-            self.hitpoints += random.randint(15, 30)  # Increase HP
-            self.strength += random.randint(1, 2)  # Increase Strength
+            self.maxhp += random.randint(20, 30)  # Increase HP
+            self.hitpoints = self.maxhp
+            self.strength += random.randint(2, 4)  # Increase Strength
             ui_panel.update_stats(player)
             level3done = True
-
+            bosstrspawnf = True
+        return bosstrspawnf
 
 # Initialize Player Stats
 initial_hp=random.randint(25, 35)

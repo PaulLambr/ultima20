@@ -20,7 +20,7 @@ player_x, player_y = 0, 0
 restore_x, restore_y = player_x, player_y
 
 
-def combat(player_level, tile_type, enemy_type, winning):
+def combat(player_level, tile_type, enemy_type, winning, bosstrspawnf):
     global attack_mode, pending_attack, ui_panel
     winning = False
     ...
@@ -48,9 +48,11 @@ def combat(player_level, tile_type, enemy_type, winning):
     player_x, player_y = 6, 10
 
     # Determine the number of enemies based on player level
-    if (enemy_x, enemy_y) == "trollboss":
+    
+    if enemy_type == "trollboss":
         num_enemies = 8
     else:
+
         num_enemies = min(player_level, 5)
     
     enemy_list = []
@@ -107,7 +109,7 @@ def combat(player_level, tile_type, enemy_type, winning):
                 ):  # If "A" was pressed, register the next key as attack direction
                     pending_attack = event.key
                     attack_mode = False
-                    attack(player_x, player_y, pending_attack, enemy_list)
+                    attack(player_x, player_y, pending_attack, enemy_list, bosstrspawnf)
 
                     # ✅ Trigger adjacency check after an attack
                     new_enemy_list = []
@@ -246,7 +248,7 @@ def combat(player_level, tile_type, enemy_type, winning):
             running = False  # Exit the battle loop
         
         
-        elif 0 > player_x or player_x > 15 or player_y < 0 or player_y > 15:
+        elif 1 > player_x or player_x > 14 or player_y < 1 or player_y > 14:
             print("🚪 Player has escaped the battle.")
             winning = False
             pygame.time.delay(500)
@@ -268,10 +270,10 @@ def enemy_attack(enemy_list, enemy_index, player_x, player_y):
     ):
         armor_key = player.armor.lower()  # ✅ Convert to lowercase to match dictionary keys
         armor_data = merchantwares.MERCHANT_WARES.get(armor_key, None)  # ✅ Retrieve weapon object
-        armorcoeff = armor_data.protection if armor_data else 0  # ✅ Default to 0 if no weapon found
+        armorcoeff = armor_data.protection if armor_data else 1  # ✅ Default to 0 if no weapon found
         
         enemy_damage = round(
-            random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength - armorcoeff
+            (random.uniform(1, 2) * ENEMIES_LIST[enemy_list[enemy_index][2]].strength) * armorcoeff
         )
         player.hitpoints -= enemy_damage
         print(
@@ -322,7 +324,7 @@ def move_enemy_battle(
     return enemy_x, enemy_y  # Stay in place if blocked
 
 
-def attack(player_x, player_y, direction, enemy_list):
+def attack(player_x, player_y, direction, enemy_list, bosstrspawnf):  # ✅ Add bosstrspawnf
     """
     Processes an attack when 'A' is pressed followed by a direction key.
     """
@@ -339,23 +341,24 @@ def attack(player_x, player_y, direction, enemy_list):
 
     for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
         if attack_x == ex and attack_y == ey:
-            damage(i, enemy_list)
-            return
+            bosstrspawnf = damage(i, enemy_list, bosstrspawnf)  # ✅ Pass and receive bosstrspawnf
+            return bosstrspawnf  # ✅ Ensure updated value is returned
+
+    return bosstrspawnf  # If no enemy was hit, return unchanged
 
 
-def damage(enemy_index, enemy_list):
+
+def damage(enemy_index, enemy_list, bosstrspawnf):  # ✅ Add bosstrspawnf as an argument
     """
     Reduces enemy hitpoints and removes the enemy if they are defeated.
     """
-    weapon_key = player.weapon.lower()  # ✅ Convert to lowercase to match dictionary keys
-    weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)  # ✅ Retrieve weapon object
-    weaponcoeff = weapon_data.damage if weapon_data else 0  # ✅ Default to 0 if no weapon found
+    weapon_key = player.weapon.lower()
+    weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)
+    weaponcoeff = weapon_data.damage if weapon_data else 0
 
     enemy_damage = random.uniform(1, 2) * (player.strength + weaponcoeff)
     enemy_list[enemy_index][4] -= enemy_damage
-    print(
-        f"\n You scored {enemy_damage} points against {enemy_list[enemy_index][4]} enemy hp."
-    )
+    print(f"\n You scored {enemy_damage} points against {enemy_list[enemy_index][4]} enemy hp.")
 
     # If enemy health is zero or below, remove it and grant XP
     if enemy_list[enemy_index][4] <= 0:
@@ -363,6 +366,10 @@ def damage(enemy_index, enemy_list):
         enemy_xp = ENEMIES_LIST[enemy_type].xp  # Get XP value from enemy
 
         player.xp += enemy_xp  # ✅ Update player's XP directly
-        player.levelup()
-        ui_panel.update_stats(player)  # ✅ Update UI
+        bosstrspawnf = player.levelup(bosstrspawnf)  # ✅ Ensure updated `bosstrspawnf` is stored
+
+        print(f"DEBUG: bosstrspawnf after leveling up = {bosstrspawnf}")  # ✅ Debugging
+        ui_panel.update_stats(player)
         del enemy_list[enemy_index]  # Remove defeated enemy
+    
+    return bosstrspawnf  # ✅ Return updated value

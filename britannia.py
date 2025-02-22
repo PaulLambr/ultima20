@@ -100,9 +100,10 @@ def britannia_castle():
                 # ✅ Allow closing dialog with ESC
                 if event.key == pygame.K_ESCAPE:
                     show_dialog = False  # Close dialog
+                    show_dialog2 = False
 
                 # ✅ Move the player ONLY IF the dialog is NOT open
-                if not show_dialog:
+                if not show_dialog and not show_dialog2:
                     new_x, new_y = player_x, player_y
 
                     if event.key == pygame.K_LEFT and player_x > 0:

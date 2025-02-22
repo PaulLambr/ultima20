@@ -18,7 +18,7 @@ pygame.display.set_caption("The Realm of Britannia")
 clock = pygame.time.Clock()  # Controls frame rate
 
 from tiletypes.tiletypes import TILE_TYPES  # Import tile types
-from enemies.enemies import spawnenemy, moveenemy
+from enemies.enemies import spawnenemy, moveenemy, bosstrspawn
 from battle import combat  # Import combat system
 from ui import UI
 from utils import returntomap, openchest, fled
@@ -36,6 +36,7 @@ world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
 # Add some rocks manually for testing (impassable areas)
 
 world_map[7][10] = "britannia"
+world_map[8][4] = "trollbossspawn"
 
 
 # Two rows of hills along the other 3 sides
@@ -70,6 +71,7 @@ enemy_present = False
 enemy_x, enemy_y, enemy_sprite = None, None, None
 enemy_type = None  # Ensure it's always defined
 winning = False
+bosstrspawnf = False
 
 
 # Game loop
@@ -175,7 +177,7 @@ while running:
                         print(f"\n before combat is called tile_type is {tile_type}")
                         
                         
-                        winning = combat(player_level, tile_type, enemy_type, winning)  
+                        winning = combat(player_level, tile_type, enemy_type, winning, bosstrspawnf)  
 
                         # ✅ Restore position after combat
                         returned_position = returntomap(player_x, player_y, restore_x, restore_y)
@@ -213,14 +215,28 @@ while running:
                         
                         enemy_present = False  # Enemy defeated, remove from overworld
 
-    # Spawn enemy every 60 frames
-    frame_counter += 1
-    if frame_counter >= SPAWN_INTERVAL and not enemy_present:
-        spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
-        if spawn_result:
-            enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
-            enemy_present = True  # Enemy is now on the map
-        frame_counter = 0
+    if player.level >= 4 and not bosstrspawnf:
+        print("🔥 Player reached level 4! Boss should spawn.")
+        bosstrspawnf = True
+        
+    if bosstrspawnf:
+        boss_data = bosstrspawn(world_map, TILE_TYPES)  # Find the boss tile
+        if boss_data:
+            enemy_x, enemy_y, enemy_sprite, enemy_type = boss_data  # Place the boss
+            enemy_present = True  # Ensure the boss is displayed
+
+
+        
+    else:
+    
+        # Spawn enemy every 60 frames
+        frame_counter += 1
+        if frame_counter >= SPAWN_INTERVAL and not enemy_present:
+            spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
+            if spawn_result:
+                enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
+                enemy_present = True  # Enemy is now on the map
+            frame_counter = 0
 
     
     # Only redraw if necessary
@@ -272,13 +288,11 @@ while running:
         # Draw player sprite at the player's position
         screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-        # Draw enemy if present
+        # ✅ Draw the enemy if it's present
         if enemy_present and enemy_sprite:
-            enemy_scaled = pygame.transform.scale(
-                enemy_sprite, (TILE_SIZE, TILE_SIZE)
-            )  # Scale to fit tiles
-            screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))
-            
+            enemy_scaled = pygame.transform.scale(enemy_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
+            screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))  # Render at the boss spawn
+
                 
 
         # Draw UI Panel (Stats)

@@ -285,6 +285,15 @@ class Dialog:
                         elif not player.item2:  # Second slot empty
                             player.item2 = item_data.item_name
                             print(f"👜 Added {item_data.item_name} to inventory slot 2")
+                        elif not player.item3:  # Second slot empty
+                            player.item3 = item_data.item_name
+                            print(f"👜 Added {item_data.item_name} to inventory slot 3")
+                        elif not player.item4:  # Second slot empty
+                            player.item4 = item_data.item_name
+                            print(f"👜 Added {item_data.item_name} to inventory slot 4")
+                        elif not player.item5:  # Second slot empty
+                            player.item5 = item_data.item_name
+                            print(f"👜 Added {item_data.item_name} to inventory slot 5")
                         else:
                             print("⚠️ Inventory full! Sell or drop an item.")
                             player.gold += item_data.purchvalue  # Refund gold

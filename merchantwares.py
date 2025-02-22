@@ -35,7 +35,7 @@ class MerchantWares:
 MERCHANT_WARES = {
     "vorpal blade": MerchantWares("all", 100, 50, 5, None, None, "Vorpal Blade", True, False),
     "morningstar": MerchantWares("all", 250, 125, 8, None, None, "Morningstar", True, False),
-    "leather armor": MerchantWares("all", 1000, 100, None, 3, None, "Leather Armor", False, True),
-    "hauberk": MerchantWares("all", 1000, 250, None, 8, None, "Hauberk", False, True),
+    "leather armor": MerchantWares("all", 200, 100, None, .8, None, "Leather Armor", False, True),
+    "hauberk": MerchantWares("all", 500, 250, None, .6, None, "Hauberk", False, True),
     "healing salve": MerchantWares("all", 30, None, None, None, 25, "Healing Salve", False, False),
 }

@@ -59,6 +59,7 @@ TILE_TYPES = {
     "bricks": Tile(None, "sprites/bricks.png", (128, 128, 128), True),
     "weaponshoppe": Tile("sprites/weaponshoppe.png", "sprites/bricks.png", (165, 42, 42), False),
     "arch": Tile("sprites/arch.png", "sprites/bricks.png", (165, 42, 42), True),
-    "castle_stone": Tile(None, "sprites/castle_stone.png", (128, 128, 128), False)
+    "castle_stone": Tile(None, "sprites/castle_stone.png", (128, 128, 128), False),
+    "trollbossspawn": Tile(None, "sprites/grassland.png", (128, 128, 128), True)
     
 }

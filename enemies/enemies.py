@@ -101,3 +101,23 @@ def moveenemy(enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES):
         return new_x, new_y  # Move enemy to new position
 
     return enemy_x, enemy_y  # Stay in place if blocked
+
+def bosstrspawn(world_map, TILE_TYPES):
+    """
+    Finds the 'trollbossspawn' tile in the world map and places the 'trollboss' there.
+    Returns the boss's coordinates and sprite.
+    """
+    enemy_type = "trollboss"
+    
+    # ✅ Locate the "trollbossspawn" tile in the world map
+    for row in range(len(world_map)):
+        for col in range(len(world_map[row])):
+            if world_map[row][col] == "trollbossspawn":
+                boss_x, boss_y = col, row  # Get the coordinates
+                
+                enemy = ENEMIES_LIST[enemy_type]  # Get the boss details
+                enemy.load_sprite()  # Load the boss sprite
+                
+                return boss_x, boss_y, enemy.sprite, enemy_type  # Return the boss data
+
+    return None  # If the tile isn't found, return None
