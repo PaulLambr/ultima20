@@ -24,7 +24,7 @@ def openchest(
     player_y,
     pending_open,
     world_map,
-    GRID_SIZE,
+    WORLD_SIZE,
     ENEMIES_LIST,
     enemy_type,
     ui_panel,
@@ -46,7 +46,7 @@ def openchest(
         open_y += 1
 
     # Ensure within bounds
-    if 0 <= open_x < GRID_SIZE and 0 <= open_y < GRID_SIZE:
+    if 0 <= open_x < WORLD_SIZE and 0 <= open_y < WORLD_SIZE:
         if world_map[open_y][open_x] == "chest":
             print(f"✅ Chest detected at ({open_x}, {open_y})")
 

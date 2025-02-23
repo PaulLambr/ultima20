@@ -7,6 +7,7 @@ pygame.font.init()
 # ✅ Set up the display *before* loading images
 TILE_SIZE = 50
 GRID_SIZE = 15  # 15x15 map
+WORLD_SIZE = 100
 WIDTH, HEIGHT = TILE_SIZE * GRID_SIZE + 400, TILE_SIZE * GRID_SIZE  # UI width = 300
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -25,36 +26,14 @@ from utils import returntomap, openchest, fled
 from gamestate import player, ui_panel, PlayerStats
 from enemies.enemies import ENEMIES_LIST
 from britannia import britannia_castle
+from worldmap import getworldmap, playercamera
 
 for tile in TILE_TYPES.values():
     tile.load_sprite()
     tile.load_background()
 
-# Sample 15x15 map using tile type keys
-world_map = [["grassland"] * GRID_SIZE for _ in range(GRID_SIZE)]
-
-# Add some rocks manually for testing (impassable areas)
-
-world_map[7][10] = "britannia"
-world_map[8][4] = "trollbossspawn"
-
-
-# Two rows of hills along the other 3 sides
-for col in range(15):  # Top and bottom borders
-    world_map[1][col] = "hills"
-    world_map[14][col] = "hills"
-    world_map[2][col] = "hills"
-    world_map[13][col] = "hills"
-
-for row in range(15):  # Left and right borders
-    
-    world_map[row][14] = "hills"
-    
-    world_map[row][13] = "hills"
-    
-# Wall of rocks along row 1
-for col in range(15):
-    world_map[0][col] = "rock"
+world_map = getworldmap()
+camera_x, camera_y = 0,0
 
 # Player starting position
 player_x, player_y = 2,3
@@ -110,11 +89,11 @@ while running:
 
             if event.key == pygame.K_LEFT and player_x > 0:
                 new_x -= 1
-            if event.key == pygame.K_RIGHT and player_x < GRID_SIZE - 1:
+            if event.key == pygame.K_RIGHT and player_x < WORLD_SIZE - 1:
                 new_x += 1
             if event.key == pygame.K_UP and player_y > 0:
                 new_y -= 1
-            if event.key == pygame.K_DOWN and player_y < GRID_SIZE - 1:
+            if event.key == pygame.K_DOWN and player_y < WORLD_SIZE - 1:
                 new_y += 1
 
             if event.key == pygame.K_o:  # Enter open chest mode
@@ -141,14 +120,14 @@ while running:
                     open_y += 1
 
                 # Ensure within bounds and process chest
-                if 0 <= open_x < GRID_SIZE and 0 <= open_y < GRID_SIZE:
+                if 0 <= open_x < WORLD_SIZE and 0 <= open_y < WORLD_SIZE:
                    
                     openchest(
                         player_x,
                         player_y,
                         pending_open,
                         world_map,
-                        GRID_SIZE,
+                        WORLD_SIZE,
                         ENEMIES_LIST,
                         enemy_type,
                         ui_panel,
@@ -158,9 +137,11 @@ while running:
             # Check if new position is passable
             if TILE_TYPES[world_map[new_y][new_x]].passable:
                 player_x, player_y = new_x, new_y
+                camera_x, camera_y, grid_size = playercamera(player_x, player_y, world_map)
+
                 redraw_needed = True
 
-                if world_map[player_y][player_x] == world_map[7][10]:
+                if world_map[player_y][player_x] == "britannia":
                     britannia_castle()
 
                 # Move the enemy towards the player
@@ -248,7 +229,7 @@ while running:
             for col in range(GRID_SIZE):
                 if world_map[row][col] == "chest":
                     print(f"Chest found at ({col}, {row}) in world_map")
-                tile_type = world_map[row][col]
+                tile_type = world_map[row + camera_y][col + camera_x]
                 # print(f"\ntile type is {tile_type} when drawing map")
                 tile = TILE_TYPES[tile_type]
                 if tile.background2:
@@ -286,13 +267,11 @@ while running:
                     screen.blit(sprite_scaled, (col * TILE_SIZE, row * TILE_SIZE))
 
         # Draw player sprite at the player's position
-        screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
+        screen.blit(player_sprite,((player_x - camera_x) * TILE_SIZE, (player_y - camera_y) * TILE_SIZE))
 
-        # ✅ Draw the enemy if it's present
         if enemy_present and enemy_sprite:
-            enemy_scaled = pygame.transform.scale(enemy_sprite, (TILE_SIZE, TILE_SIZE))  # Scale to fit tiles
-            screen.blit(enemy_scaled, (enemy_x * TILE_SIZE, enemy_y * TILE_SIZE))  # Render at the boss spawn
-
+            enemy_scaled = pygame.transform.scale(enemy_sprite, (TILE_SIZE, TILE_SIZE))
+            screen.blit(enemy_scaled,((enemy_x - camera_x) * TILE_SIZE, (enemy_y - camera_y) * TILE_SIZE))
                 
 
         # Draw UI Panel (Stats)
