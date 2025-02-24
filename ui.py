@@ -1,5 +1,7 @@
 import pygame
 import merchantwares  # ✅ Import the module itself, not specific items
+#from gamestate import PlayerStats
+
 
 class UI:
     def __init__(self, player):
@@ -203,6 +205,7 @@ class UI:
         return None
     
     def drop_item(self, pos, player):
+        
         """Drops an item from the inventory if the corresponding drop button is clicked."""
         for button_name, rect in self.buttons.items():
             if rect.collidepoint(pos) and button_name.startswith("Drop_"):
@@ -301,7 +304,17 @@ class Dialog:
                         player.potions += 1
                     else:
                         # ✅ Check inventory slots and assign the item correctly
-                        if not player.item1:  # First slot empty
+                        if player.item1 == item_data.item_name:
+                            return None
+                        elif player.item2 == item_data.item_name:
+                            return None
+                        elif player.item3 == item_data.item_name:
+                            return None
+                        elif player.item4 == item_data.item_name:
+                            return None
+                        elif player.item5 == item_data.item_name:
+                            return None
+                        elif not player.item1:
                             player.item1 = item_data.item_name
                             print(f"👜 Added {item_data.item_name} to inventory slot 1")
                         elif not player.item2:  # Second slot empty
@@ -320,7 +333,7 @@ class Dialog:
                             print("⚠️ Inventory full! Sell or drop an item.")
                             player.gold += item_data.purchvalue  # Refund gold
                             return None
-                        print(f"Inventory: Slot 1 = {player.item1}, Slot 2 = {player.item2}")
+                       
 
 
                 else:
@@ -374,3 +387,74 @@ class Dialog:
                 screen.blit(text_surface, (button_x + 20, button_y + 5))
 
             y_offset += 31  # Move down for next item
+            
+    def draw3(self, screen, dialog_text):
+        """Draws the merchant wares with sell buttons."""
+        self.font = pygame.font.Font(None, 23)
+        panel_y = screen.get_height() - self.HEIGHT
+        pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
+
+        # Display text
+        y_offset = panel_y + 15
+        self.buttons = {}  # Reset buttons
+
+        for line in dialog_text:
+            text_surface = self.font.render(line, True, self.TEXT_COLOR)
+            screen.blit(text_surface, (10, y_offset))
+
+            # Ensure this line has an item to buy
+            if ":" in line:
+                item_name = line.split(":")[0].strip()  # ✅ Extract exact item name
+                button_x = 400
+                button_y = y_offset
+                button_width = 80
+                button_height = 30
+
+                rect = pygame.Rect(button_x, button_y, button_width, button_height)
+                self.buttons[item_name] = rect  # ✅ Store the full name (e.g., "Vorpal Blade")
+
+                # Change color if hovering
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if rect.collidepoint(mouse_x, mouse_y):
+                    pygame.draw.rect(screen, self.button_hover_color, rect)
+                else:
+                    pygame.draw.rect(screen, self.button_color, rect)
+
+                # Draw "Sell" text
+                text_surface = self.font.render("Sell", True, self.button_text_color)
+                screen.blit(text_surface, (button_x + 20, button_y + 5))
+
+            y_offset += 31  # Move down for next item
+            
+    def handle_sell_click(self, pos, player):
+        from utils import drop
+        from gamestate import ui_panel
+        for item_name, rect in self.buttons.items():
+            if rect.collidepoint(pos):
+                key_name = item_name.lower()
+                if key_name in merchantwares.MERCHANT_WARES:
+                    item_data = merchantwares.MERCHANT_WARES[key_name]
+                
+                    # Check if the item is still in any inventory slot
+                    in_inventory = (
+                        (isinstance(player.item1, str) and player.item1.lower() == key_name) or
+                        (isinstance(player.item2, str) and player.item2.lower() == key_name) or
+                        (isinstance(player.item3, str) and player.item3.lower() == key_name) or
+                        (isinstance(player.item4, str) and player.item4.lower() == key_name) or
+                        (isinstance(player.item5, str) and player.item5.lower() == key_name)
+                    )
+                
+                    if not in_inventory:
+                        print(f"⚠️ No instance of {item_data.item_name} in inventory to sell.")
+                        return None
+
+                    # Process sale: increase gold and remove the item
+                    player.gold += item_data.sellvalue
+                    print(f"✅ Sold {item_data.item_name} for {item_data.sellvalue} gold!")
+                    drop(item_data.item_name)  # This should remove the item from inventory
+                    ui_panel.update_stats(player)
+                    return item_data.item_name
+                else:
+                    print(f"⚠️ Item '{item_name}' not found in merchantwares!")
+                    return None
+        return None

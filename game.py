@@ -82,9 +82,11 @@ while running:
                 ui_panel.equip_item(event.pos, player)  # ✅ Equip item logic triggered
                 ui_panel.update_stats(player)  # ✅ Refresh UI
 
-            elif selected_action == "Drop":
-                print("Drop button clicked!")
-
+            elif selected_action and selected_action.startswith("Drop_"):
+                    print("\nYou clicked drop")
+                    ui_panel.drop_item(event.pos, player)
+                    ui_panel.update_stats(player)
+                    
         if event.type == pygame.KEYDOWN:
             new_x, new_y = player_x, player_y
 
@@ -183,8 +185,13 @@ while running:
                     chest_replacement_tiles = {}
                     if world_map[restore_y][restore_x] != "britannia":
                         print(f"📦 Placing chest at ({restore_x}, {restore_y})")
-                        chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
+                        chest_replacement_tiles[(restore_x, restore_y)] = {
+                            "tile": world_map[restore_y][restore_x],
+                            "enemy": enemy_type
+                        }
+
                         world_map[restore_y][restore_x] = "chest"
+
                         TILE_TYPES["chest"].background = TILE_TYPES[
                             tile_type
                         ].background
@@ -209,6 +216,11 @@ while running:
     if (player_x, player_y) == (3,94) and not bosstrspawnf:
         print("🔥 Player triggered the trap! Boss should spawn.")
         bosstrspawnf = True
+    
+    if (player_x, player_y) == (3,92) and bosstrspawnf:
+        print("🔥 Player closed the trap! Other enemies should appear.")
+        bosstrspawnf = False
+    
         
     if bosstrspawnf:
         boss_data = bosstrspawn(world_map, TILE_TYPES)  # Find the boss tile

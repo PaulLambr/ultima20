@@ -7,6 +7,7 @@ pygame.init()  # 🔥 This must run before creating fonts in UI
 level1done = False
 level2done = False
 level3done = False
+level4done = False
 
 
 class PlayerStats:
@@ -30,7 +31,7 @@ class PlayerStats:
         
 
     def levelup(self, bosstrspawnf):
-        global level1done, level2done, level3done
+        global level1done, level2done, level3done, level4done
         if self.xp >= 125 and level1done == False:  # Level up when XP reaches 100
             self.level += 1
             self.maxhp += random.randint(5, 10)  # Increase HP
@@ -48,7 +49,7 @@ class PlayerStats:
             ui_panel.update_stats(player)
             level2done = True
         elif (
-            self.xp >= 1500 and level1done and level2done and not level3done
+            self.xp >= 900 and level1done and level2done and not level3done
         ):  # Level up when XP reaches 100
             self.level += 1
             self.maxhp += random.randint(20, 30)  # Increase HP
@@ -56,6 +57,18 @@ class PlayerStats:
             self.strength += random.randint(2, 4)  # Increase Strength
             ui_panel.update_stats(player)
             level3done = True
+            
+        elif (
+            self.xp >= 1500 and level1done and level2done and level3done and not level4done
+        ):  # Level up when XP reaches 100
+            self.level += 1
+            self.maxhp += random.randint(25, 35)  # Increase HP
+            self.hitpoints = self.maxhp
+            self.strength += random.randint(3, 6)  # Increase Strength
+            ui_panel.update_stats(player)
+            level4done = True
+            
+            
         return bosstrspawnf
 
 # Initialize Player Stats
@@ -66,7 +79,7 @@ player = PlayerStats(
     hitpoints=initial_hp,
     maxhp=initial_hp,
     strength=random.randint(5, 10),
-    gold=500,
+    gold=100,
     xp=0,
     weapon="Fists",
     armor="Furs",

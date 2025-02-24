@@ -26,7 +26,7 @@ def openchest(
     world_map,
     WORLD_SIZE,
     ENEMIES_LIST,
-    enemy_type,
+    enemy_type,   # This might be a fallback if nothing is stored
     ui_panel,
     chest_replacement_tiles
 ):
@@ -50,36 +50,39 @@ def openchest(
             chest_replacement_tiles = {}
             print("\nYou are trying to open the holy chest.")
             additem("holy ruby")
-            # Store the current tile type before opening the chest
+            # For the holy chest, you might not need loot calculation.
             original_tile = chest_replacement_tiles.get((open_x, open_y), "grassland")
-            # Replace the chest with the original terrain
             world_map[open_y][open_x] = original_tile
             print(f"✅ Chest removed. Tile at ({open_x}, {open_y}) is now '{original_tile}'.")
-
-            # Remove the entry from the dictionary
             if (open_x, open_y) in chest_replacement_tiles:
                 del chest_replacement_tiles[(open_x, open_y)]
-                
-            # Force redraw and update UI
             redraw_needed = True
             ui_panel.update_stats(player)
         
         elif world_map[open_y][open_x] == "chest":
             print(f"✅ Chest detected at ({open_x}, {open_y})")
 
-            # Store the current tile type before opening the chest
-            original_tile = chest_replacement_tiles.get((open_x, open_y), "grassland")
+            # Retrieve stored chest info if available
+            chest_info = chest_replacement_tiles.get((open_x, open_y))
+            if chest_info is not None:
+                original_tile = chest_info.get("tile", "grassland")
+                stored_enemy_type = chest_info.get("enemy", None)
+            else:
+                original_tile = "grassland"
+                stored_enemy_type = None
 
-            # If enemy_type is None (e.g. after a boss fight), default it to "trollboss"
-            if enemy_type is None:
-                enemy_type = "trollboss"
+            # Use stored_enemy_type if available; otherwise fall back to enemy_type parameter.
+            if stored_enemy_type is not None:
+                effective_enemy = stored_enemy_type
+            else:
+                effective_enemy = enemy_type if enemy_type is not None else "trollboss"
 
-            # Remap if still "trollbossspawn"
-            if enemy_type.lower() == "trollbossspawn":
-                enemy_type = "trollboss"
+            # Remap if necessary
+            if effective_enemy.lower() == "trollbossspawn":
+                effective_enemy = "trollboss"
 
-            if enemy_type and enemy_type in ENEMIES_LIST:
-                loot_factor = ENEMIES_LIST[enemy_type].loot * player.level
+            if effective_enemy and effective_enemy in ENEMIES_LIST:
+                loot_factor = ENEMIES_LIST[effective_enemy].loot * player.level
             else:
                 loot_factor = 5
 
@@ -90,11 +93,9 @@ def openchest(
             world_map[open_y][open_x] = original_tile
             print(f"✅ Chest removed. Tile at ({open_x}, {open_y}) is now '{original_tile}'.")
 
-            # Remove the entry from the dictionary
             if (open_x, open_y) in chest_replacement_tiles:
                 del chest_replacement_tiles[(open_x, open_y)]
                 
-            # Force redraw and update UI
             redraw_needed = True
             ui_panel.update_stats(player)
 
@@ -120,16 +121,19 @@ def talk(player_x, player_y, pending_talk, castle_map):
             print(f"✅ Merchant detected at ({talk_x}, {talk_y})")
             return True, ["Welcome, weary traveler, to my humble shoppe."], True  # ✅ Enable dialog & send text
         elif castle_map[talk_y][talk_x] == "adventurer":
-            if player.item1 or player.item2 or player.item3 or player.item4 or player.item5 == "holy ruby":
+            if any(isinstance(item, str) and item.lower() == "holy ruby" for item in 
+                [player.item1, player.item2, player.item3, player.item4, player.item5]):
+                # Trigger reward logic
+
                 print(f"✅ Adventurer detected at ({talk_x}, {talk_y}) and you have the ruby")
                 player.gold += 500
                 drop("holy ruby")
                 return(True), ["Say I guess you're not as big of a sissy as I thought.",
                            "Here's a little honorarium for your trouble."], False
             else:
-                return True, ["Hey you. You think you're better than me...",
+                return True, ["Hey you. You think you're better than me...[hic]",
                           "Well you're not. See. Now I could take you in a fight.",
-                          "Say have you heard about this troll nest far to the south.",
+                          "Say have you heard about this troll nest far to the south???",
                           "They say there's a treasure of great value there. Bring me this treasure and I will reward you handsomely."], False  # ✅ Enable dialog & send text
         else:
             print("❌ No one in that direction.")

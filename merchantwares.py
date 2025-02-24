@@ -1,5 +1,6 @@
 import pygame
 
+
 # ✅ Ensure pygame is initialized first
 pygame.init()  # 🔥 This must run before creating fonts in UI
 
@@ -26,6 +27,23 @@ class MerchantWares:
             if details.availability == "all":
                 dialog_text.append(f"{details.item_name}: {details.purchvalue} gold")
         return dialog_text
+    
+    @staticmethod
+    def showsell(player):
+        # Build a list of items the player has that are sellable
+        dialog_text = ["What would you like to sell?"]
+        # Check each inventory slot to see if it contains an item that can be sold.
+        sellable = []
+        for slot in [player.item1, player.item2, player.item3, player.item4, player.item5]:
+            if isinstance(slot, str):  # Only if there is an item
+                key = slot.lower()
+                # If the item exists in MERCHANT_WARES and it is marked as sellable
+                if key in MERCHANT_WARES and MERCHANT_WARES[key].cansell:
+                    sellable.append((MERCHANT_WARES[key].item_name, MERCHANT_WARES[key].sellvalue))
+        for item_name, sellvalue in sellable:
+            dialog_text.append(f"{item_name}: {sellvalue} gold")
+        return dialog_text
+
 
 
 

@@ -19,6 +19,7 @@ def britannia_castle():
     talk_mode = False
     show_dialog = False  # ✅ Track whether the dialog panel is visible
     show_dialog2 = False
+    show_dialog3 = False
     dialog_text = []  # ✅ Store the current dialog text
     selected_action = None
     selected_item = None
@@ -104,9 +105,10 @@ def britannia_castle():
                 if event.key == pygame.K_ESCAPE:
                     show_dialog = False  # Close dialog
                     show_dialog2 = False
+                    show_dialog3 = False
 
                 # ✅ Move the player ONLY IF the dialog is NOT open
-                if not show_dialog and not show_dialog2:
+                if not show_dialog and not show_dialog2 and not show_dialog3:
                     new_x, new_y = player_x, player_y
 
                     if event.key == pygame.K_LEFT and player_x > 0:
@@ -156,8 +158,9 @@ def britannia_castle():
 
                     elif selected_action == "Sell":
                         print("💰 Opening player inventory for selling...")
-                        
-                        # TODO: Add selling logic here
+                        dialog_text = MerchantWares.showsell(player)
+                        show_dialog = False
+                        show_dialog3 = True
 
                 elif (
                     show_dialog2
@@ -170,6 +173,12 @@ def britannia_castle():
                         print(
                             f"\nYou purchased {selected_item}"
                         )  # ✅ Print correct item
+                        
+                elif (show_dialog3):
+                    selected_item = dialog_panel.handle_sell_click(event.pos, player)
+                    
+                    if selected_item:
+                        print(f"\nYou sold {selected_item} ")
 
         # Draw the screen
         screen.fill(BLACK)
@@ -223,6 +232,9 @@ def britannia_castle():
 
         if show_dialog2:
             dialog_panel.draw2(screen, dialog_text)
+            
+        if show_dialog3:
+            dialog_panel.draw3(screen, dialog_text)
 
         pygame.display.update()
 
