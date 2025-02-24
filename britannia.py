@@ -16,6 +16,7 @@ BLACK = (0, 0, 0)
 
 def britannia_castle():
     pygame.init()
+    pygame.mixer.init()
     talk_mode = False
     show_dialog = False  # ✅ Track whether the dialog panel is visible
     show_dialog2 = False
@@ -24,6 +25,10 @@ def britannia_castle():
     selected_action = None
     selected_item = None
     showbuysell = False
+    
+    pygame.mixer.music.load("music/died.mp3")
+    pygame.mixer.music.play(-1)  # Loops indefinitely
+
 
     player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()
     player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))
@@ -52,6 +57,11 @@ def britannia_castle():
     castle_map[0][2] = "weaponshoppe"
     castle_map[1][2] = "merchant"
     castle_map[1][10] = "adventurer"
+    castle_map[0][10] = "bartender"
+    castle_map[0][9] = "barnw"
+    castle_map[1][9] = "barsw"
+    castle_map[0][11] = "barne"
+    castle_map[1][11] = "barse"
     castle_map[11][8] = "arch"
 
 

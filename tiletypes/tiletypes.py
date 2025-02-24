@@ -63,8 +63,13 @@ TILE_TYPES = {
     "castle_stone": Tile(None, "sprites/castle_stone.png", (128, 128, 128), False),
     "trollbossspawn": Tile("sprites/troll.png", "sprites/hills.png", (128, 128, 128), True),
     "chestruby": Tile("sprites/chest_trans.png", "sprites/grassland.png", (139, 69, 19), True),
-    "adventurer": Tile("sprites/merchant.png", None, (165, 42, 42), False)
-    
+    "adventurer": Tile(None, "sprites/adventurer.png", (165, 42, 42), False),
+    "bartender": Tile(None, "sprites/bartender.png", (165, 42, 42), False),
+    "barnw": Tile(None, "sprites/barnw.png", (165, 42, 42), False),
+    "barse": Tile(None, "sprites/barse.png", (165, 42, 42), True),    
+    "barsw": Tile(None, "sprites/barsw.png", (165, 42, 42), True),
+    "barne": Tile(None, "sprites/barne.png", (165, 42, 42), False),
+    "water": Tile(None, "sprites/water.png", (165, 42, 42), False)
 }
 
 def is_tile_passable(tile_type):

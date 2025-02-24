@@ -36,7 +36,7 @@ world_map = getworldmap()
 camera_x, camera_y = 0,0
 
 # Player starting position
-player_x, player_y = 7,15
+player_x, player_y = 35,35
 player_level = 1
 restore_x, restore_y = player_x, player_y  # Ensure it's initialized
 player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar

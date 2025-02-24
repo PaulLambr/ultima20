@@ -16,21 +16,24 @@ def getworldmap():
     for _ in range(20):  # Random mountains
         x, y = random.randint(20, 80), random.randint(20, 80)
         world_map[y][x] = "rock"
+        
+    for col in range(WORLD_SIZE):  # Top and bottom borders
+        world_map[1][col] = "hills"
+        world_map[2][col] = "hills"
+        world_map[3][col] = "hills"
+        
+    for row in range(WORLD_SIZE):  # Left and right borders
+        world_map[row][0] = "rock"
+        world_map[row][1] = "hills"
+        world_map[row][2] = "hills"
+        world_map[row][3] = "hills"
+        world_map[row][99] = "rock"
 
     # Borders of the world made of rocks
     for col in range(WORLD_SIZE):  # Top and bottom borders
         world_map[0][col] = "rock"
-        world_map[1][col] = "hills"
-        world_map[2][col] = "hills"
-        world_map[3][col] = "hills"
         world_map[99][col] = "rock"
-
-    for row in range(WORLD_SIZE):  # Left and right borders
-        world_map[row][0] = "rock"
-        world_map[row][99] = "rock"
         
-  
-    
     #Trollbarrow
     for row in range(90,98):  # Top and bottom borders
         world_map[row][2] = "rock"
@@ -57,9 +60,21 @@ def getworldmap():
     for row in range(92,97):  # Top and bottom borders
         world_map[row][8] = "rock"
     world_map[96][5] = "hills"
-        
-   # Key locations
-    world_map[14][14] = "britannia"
+    
+    #Central Island
+    for row in range(40,60):  # Top and bottom borders
+        for col in range (40,60):
+            world_map[row][col] = "water"
+    for row in range(48,53):  # Top and bottom borders
+        for col in range (48,53):
+            world_map[row][col] = "grassland"
+    for row in range(61,99):  # Top and bottom borders
+        for col in range (48,50):
+            world_map[row][col] = "water"
+    
+    
+    # Key locations
+    world_map[12][12] = "britannia"
     world_map[96][4] = "trollbossspawn"
     world_map[94][6] = "chestruby"
     
