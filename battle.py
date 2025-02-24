@@ -50,7 +50,7 @@ def combat(player_level, tile_type, enemy_type, winning, bosstrspawnf):
     # Determine the number of enemies based on player level
     
     if enemy_type == "trollboss":
-        num_enemies = 8
+        num_enemies = 7
     else:
 
         num_enemies = min(player_level, 5)
