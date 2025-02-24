@@ -2,7 +2,7 @@ import pygame
 from ui import UI, Dialog
 from gamestate import player, ui_panel, PlayerStats, dialog_panel
 from tiletypes.tiletypes import TILE_TYPES
-from utils import talk
+from utils import talk, additem
 from merchantwares import MerchantWares  # Import it properly
 
 
@@ -22,6 +22,7 @@ def britannia_castle():
     dialog_text = []  # ✅ Store the current dialog text
     selected_action = None
     selected_item = None
+    showbuysell = False
 
     player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()
     player_sprite = pygame.transform.scale(player_sprite, (TILE_SIZE, TILE_SIZE))
@@ -49,7 +50,9 @@ def britannia_castle():
     
     castle_map[0][2] = "weaponshoppe"
     castle_map[1][2] = "merchant"
+    castle_map[1][10] = "adventurer"
     castle_map[11][8] = "arch"
+
 
     # Player starts in the center
     player_x, player_y = 8, 10
@@ -93,7 +96,7 @@ def britannia_castle():
                         0 <= talk_x < CASTLE_GRID_SIZE_X
                         and 0 <= talk_y < CASTLE_GRID_SIZE_Y
                     ):
-                        show_dialog, dialog_text = talk(
+                        show_dialog, dialog_text, showbuysell = talk(
                             player_x, player_y, pending_talk, castle_map
                         )  # ✅ Get dialog data
 
@@ -133,8 +136,11 @@ def britannia_castle():
                     ui_panel.equip_item(event.pos, player)  # ✅ Equip item logic triggered
                     ui_panel.update_stats(player)  # ✅ Refresh UI
 
-                elif selected_action == "Drop":
-                    print("Drop button clicked!")
+                elif selected_action and selected_action.startswith("Drop_"):
+                    print("\nYou clicked drop")
+                    ui_panel.drop_item(event.pos, player)
+                    ui_panel.update_stats(player)
+                    
                 if show_dialog:
                     selected_action = dialog_panel.handle_click(
                         event.pos
@@ -150,6 +156,7 @@ def britannia_castle():
 
                     elif selected_action == "Sell":
                         print("💰 Opening player inventory for selling...")
+                        
                         # TODO: Add selling logic here
 
                 elif (
@@ -210,8 +217,9 @@ def britannia_castle():
 
         screen.blit(player_sprite, (player_x * TILE_SIZE, player_y * TILE_SIZE))
 
-        if show_dialog:  # ✅ Only draw dialog if active
-            dialog_panel.draw(screen, dialog_text)
+        if show_dialog:
+            dialog_panel.draw(screen, dialog_text, show_buttons=showbuysell)
+
 
         if show_dialog2:
             dialog_panel.draw2(screen, dialog_text)

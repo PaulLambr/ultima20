@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 
 
 class Tile:
@@ -60,6 +61,20 @@ TILE_TYPES = {
     "weaponshoppe": Tile("sprites/weaponshoppe.png", "sprites/bricks.png", (165, 42, 42), False),
     "arch": Tile("sprites/arch.png", "sprites/bricks.png", (165, 42, 42), True),
     "castle_stone": Tile(None, "sprites/castle_stone.png", (128, 128, 128), False),
-    "trollbossspawn": Tile(None, "sprites/grassland.png", (128, 128, 128), True)
+    "trollbossspawn": Tile("sprites/troll.png", "sprites/hills.png", (128, 128, 128), True),
+    "chestruby": Tile("sprites/chest_trans.png", "sprites/grassland.png", (139, 69, 19), True),
+    "adventurer": Tile("sprites/merchant.png", None, (165, 42, 42), False)
     
 }
+
+def is_tile_passable(tile_type):
+    """
+    Returns True if the tile is passable.
+    For hills, there's a 70% chance of being passable.
+    """
+    if tile_type == "hills":
+        # Using random.random() gives a float between 0.0 and 1.0.
+        # Passable if the value is less than 0.7 (70% chance)
+        return random.random() < 0.7
+    # For other tiles, rely on the tile property
+    return True

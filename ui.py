@@ -201,6 +201,37 @@ class UI:
                 return item_name
 
         return None
+    
+    def drop_item(self, pos, player):
+        """Drops an item from the inventory if the corresponding drop button is clicked."""
+        for button_name, rect in self.buttons.items():
+            if rect.collidepoint(pos) and button_name.startswith("Drop_"):
+                # Extract slot info (e.g. "Drop_Item 1" → "Item 1")
+                slot = button_name.replace("Drop_", "").strip()
+                dropped_item = None
+                if slot == "Item 1":
+                    dropped_item = player.item1
+                    player.item1 = 0
+                elif slot == "Item 2":
+                    dropped_item = player.item2
+                    player.item2 = 0
+                elif slot == "Item 3":
+                    dropped_item = player.item3
+                    player.item3 = 0
+                elif slot == "Item 4":
+                    dropped_item = player.item4
+                    player.item4 = 0
+                elif slot == "Item 5":
+                    dropped_item = player.item5
+                    player.item5 = 0
+                if dropped_item:
+                    print(f"⚠️ Dropped {dropped_item} from {slot}.")
+                else:
+                    print(f"⚠️ No item in {slot} to drop.")
+                return dropped_item
+        return None
+
+        
 
 
 class Dialog:
@@ -210,49 +241,40 @@ class Dialog:
         self.BACKGROUND_COLOR = (50, 50, 50)
         self.TEXT_COLOR = (255, 255, 255)
         self.font = pygame.font.Font(None, 30)
-
-        # Button properties
         self.button_color = (100, 100, 255)
         self.button_hover_color = (150, 150, 255)
         self.button_text_color = (255, 255, 255)
-        self.buttons = {}  # Store button rects
+        self.buttons = {}
 
-    def draw(self, screen, dialog_text):
-        """Draws the dialog panel at the bottom of the screen."""
+    def draw(self, screen, dialog_text, show_buttons=True):
         panel_y = screen.get_height() - self.HEIGHT
         pygame.draw.rect(screen, self.BACKGROUND_COLOR, (0, panel_y, self.WIDTH, self.HEIGHT))
-
-        # Display text
         y_offset = panel_y + 20
         for line in dialog_text:
             text_surface = self.font.render(line, True, self.TEXT_COLOR)
             screen.blit(text_surface, (10, y_offset))
             y_offset += 40
 
-        # Draw buttons (Buy, Sell)
-        self.buttons = {}  # Reset button storage
-        button_x = 50
-        button_y = panel_y + 120  # Position buttons at the bottom of the panel
-        button_width = 100
-        button_height = 40
-        spacing = 20
+        # Only draw the buy/sell buttons if show_buttons is True
+        if show_buttons:
+            self.buttons = {}  # Reset button storage
+            button_x = 50
+            button_y = panel_y + 120
+            button_width = 100
+            button_height = 40
+            spacing = 20
+            for option in ["Buy", "Sell"]:
+                rect = pygame.Rect(button_x, button_y, button_width, button_height)
+                self.buttons[option] = rect
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if rect.collidepoint(mouse_x, mouse_y):
+                    pygame.draw.rect(screen, self.button_hover_color, rect)
+                else:
+                    pygame.draw.rect(screen, self.button_color, rect)
+                text_surface = self.font.render(option, True, self.button_text_color)
+                screen.blit(text_surface, (button_x + 25, button_y + 10))
+                button_x += button_width + spacing
 
-        for option in ["Buy", "Sell"]:
-            rect = pygame.Rect(button_x, button_y, button_width, button_height)
-            self.buttons[option] = rect  # Store button rect
-
-            # Change color if hovering
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            if rect.collidepoint(mouse_x, mouse_y):
-                pygame.draw.rect(screen, self.button_hover_color, rect)
-            else:
-                pygame.draw.rect(screen, self.button_color, rect)
-
-            # Draw text
-            text_surface = self.font.render(option, True, self.button_text_color)
-            screen.blit(text_surface, (button_x + 25, button_y + 10))
-
-            button_x += button_width + spacing  # Move to the right for next button
 
     def handle_purchase_click(self, pos, player):
         """Detects if a Buy button was clicked and processes purchase."""

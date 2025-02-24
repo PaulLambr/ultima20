@@ -316,10 +316,14 @@ def move_enemy_battle(
     random.shuffle(possible_moves)  # Shuffle movement options
 
     for new_x, new_y in possible_moves:
+        # Check boundaries first:
+        if new_x < 0 or new_x >= BATTLE_GRID_SIZE or new_y < 0 or new_y >= BATTLE_GRID_SIZE:
+            continue
         if TILE_TYPES[battle_map[new_y][new_x]].passable and (new_x, new_y) not in [
             (ex, ey) for ex, ey, _, _, _ in enemy_list
         ]:
-            return new_x, new_y  # Move enemy to new position
+            return new_x, new_y
+
 
     return enemy_x, enemy_y  # Stay in place if blocked
 

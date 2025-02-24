@@ -56,7 +56,6 @@ class PlayerStats:
             self.strength += random.randint(2, 4)  # Increase Strength
             ui_panel.update_stats(player)
             level3done = True
-            bosstrspawnf = True
         return bosstrspawnf
 
 # Initialize Player Stats
@@ -67,7 +66,7 @@ player = PlayerStats(
     hitpoints=initial_hp,
     maxhp=initial_hp,
     strength=random.randint(5, 10),
-    gold=20,
+    gold=500,
     xp=0,
     weapon="Fists",
     armor="Furs",

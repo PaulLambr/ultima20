@@ -18,11 +18,11 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Realm of Britannia")
 clock = pygame.time.Clock()  # Controls frame rate
 
-from tiletypes.tiletypes import TILE_TYPES  # Import tile types
+from tiletypes.tiletypes import TILE_TYPES, is_tile_passable  # Import tile types
 from enemies.enemies import spawnenemy, moveenemy, bosstrspawn
 from battle import combat  # Import combat system
 from ui import UI
-from utils import returntomap, openchest, fled
+from utils import returntomap, openchest, fled, additem
 from gamestate import player, ui_panel, PlayerStats
 from enemies.enemies import ENEMIES_LIST
 from britannia import britannia_castle
@@ -36,7 +36,7 @@ world_map = getworldmap()
 camera_x, camera_y = 0,0
 
 # Player starting position
-player_x, player_y = 2,3
+player_x, player_y = 7,15
 player_level = 1
 restore_x, restore_y = player_x, player_y  # Ensure it's initialized
 player_sprite = pygame.image.load("sprites/avatar.png").convert_alpha()  # Load avatar
@@ -51,6 +51,8 @@ enemy_x, enemy_y, enemy_sprite = None, None, None
 enemy_type = None  # Ensure it's always defined
 winning = False
 bosstrspawnf = False
+chest_replacement_tiles = {}
+
 
 
 # Game loop
@@ -63,7 +65,6 @@ previouscolor = None
 
 while running:
     clock.tick(60)  # Limit FPS to 60
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -133,71 +134,80 @@ while running:
                         ui_panel,
                         chest_replacement_tiles
                     )
-
-            # Check if new position is passable
-            if TILE_TYPES[world_map[new_y][new_x]].passable:
+            
+                    
+            new_tile_type = world_map[new_y][new_x]
+            # Process player input and attempt to move
+            if TILE_TYPES[new_tile_type].passable and is_tile_passable(new_tile_type):
                 player_x, player_y = new_x, new_y
+                print(f"Player at{player_x, player_y} in world_map")
                 camera_x, camera_y, grid_size = playercamera(player_x, player_y, world_map)
-
                 redraw_needed = True
 
-                if world_map[player_y][player_x] == "britannia":
+                if new_tile_type == "britannia":
                     britannia_castle()
+            else:
+                print("Movement blocked on hills this turn.")
 
-                # Move the enemy towards the player
-                if enemy_present and enemy_x is not None and enemy_y is not None:
-                    enemy_x, enemy_y = moveenemy(
-                        enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES
-                    )
+            # Move the enemy towards the player regardless of player's move success
+            if enemy_present and enemy_x is not None and enemy_y is not None:
+                enemy_x, enemy_y = moveenemy(
+            enemy_x, enemy_y, player_x, player_y, world_map, TILE_TYPES, redraw_needed
+            )
+            redraw_needed = True
 
-                    # game.py
-                    if enemy_x == player_x and enemy_y == player_y:
-                        restore_x, restore_y = player_x, player_y  # Save position
-                        tile_type = world_map[player_y][player_x]
-                        player_level = player.level
-                        print(f"\n before combat is called tile_type is {tile_type}")
-                        
-                        
-                        winning = combat(player_level, tile_type, enemy_type, winning, bosstrspawnf)  
+            if enemy_x == player_x and enemy_y == player_y:
+                restore_x, restore_y = player_x, player_y  # Save position
+                tile_type = world_map[player_y][player_x]
+                player_level = player.level
+                print(f"\nBefore combat, tile_type is {tile_type}")
 
-                        # ✅ Restore position after combat
-                        returned_position = returntomap(player_x, player_y, restore_x, restore_y)
-                        if returned_position:
-                            player_x, player_y = returned_position
-                        else:
-                            player_x, player_y = restore_x, restore_y
+                winning = combat(player_level, tile_type, enemy_type, winning, bosstrspawnf)
 
-                            # ✅ If the player won, place the chest
-                        if winning:
-                            chest_replacement_tiles = {}
-                            if world_map[restore_y][restore_x] != "britannia":
-                                print(f"📦 Placing chest at ({restore_x}, {restore_y})")
-                                chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
-                                world_map[restore_y][restore_x] = "chest"
-                                TILE_TYPES["chest"].background = TILE_TYPES[
-                                    tile_type
-                                ].background
-                                TILE_TYPES["chest"].background2 = (
-                                    None  # Reset previous background
-                                )
-                                TILE_TYPES[
-                                    "chest"
-                                ].load_background()  # Reload with new background
-                            
-                        # Reinitialize UI and screen
-                        redraw_needed = True
-                        screen = pygame.display.set_mode(
-                            (WIDTH, HEIGHT)
-                        )  # Reset game window
-                        pygame.display.set_caption("The Realm of Britannia")
-                        ui_panel = UI(player)  # Reset UI panel
-                        
-                        frame_counter = 0
-                        
-                        enemy_present = False  # Enemy defeated, remove from overworld
+                returned_position = returntomap(player_x, player_y, restore_x, restore_y)
+                if returned_position:
+                    player_x, player_y = returned_position
+                else:
+                    player_x, player_y = restore_x, restore_y
+                
+                if winning and enemy_type == "trollboss":
+                # Replace the boss spawn tile with a normal tile (e.g., "grassland")
+                    for row in range(len(world_map)):
+                        for col in range(len(world_map[0])):
+                            if world_map[row][col] == "trollbossspawn":
+                                world_map[row][col] = "hills"
+                                break
 
-    if player.level >= 4 and not bosstrspawnf:
-        print("🔥 Player reached level 4! Boss should spawn.")
+
+                if winning:
+                    chest_replacement_tiles = {}
+                    if world_map[restore_y][restore_x] != "britannia":
+                        print(f"📦 Placing chest at ({restore_x}, {restore_y})")
+                        chest_replacement_tiles[(restore_x, restore_y)] = world_map[restore_y][restore_x]
+                        world_map[restore_y][restore_x] = "chest"
+                        TILE_TYPES["chest"].background = TILE_TYPES[
+                            tile_type
+                        ].background
+                        TILE_TYPES["chest"].background2 = (
+                            None  # Reset previous background
+                        )
+                        TILE_TYPES[
+                            "chest"
+                        ].load_background()  # Reload with new background
+
+                
+                screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                pygame.display.set_caption("The Realm of Britannia")
+                ui_panel = UI(player)
+                frame_counter = 0
+                # Reset enemy variables to fully remove the enemy from the world map
+                enemy_present = False
+                enemy_x, enemy_y, enemy_sprite, enemy_type = None, None, None, None
+                redraw_needed = True
+
+    # logic for spawning the troll boss       
+    if (player_x, player_y) == (3,94) and not bosstrspawnf:
+        print("🔥 Player triggered the trap! Boss should spawn.")
         bosstrspawnf = True
         
     if bosstrspawnf:
@@ -210,14 +220,27 @@ while running:
         
     else:
     
-        # Spawn enemy every 60 frames
+        # Get current camera view offsets and grid_size
+        camera_x, camera_y, grid_size = playercamera(player_x, player_y, world_map)
+
+        # Spawn enemy every SPAWN_INTERVAL frames
         frame_counter += 1
-        if frame_counter >= SPAWN_INTERVAL and not enemy_present:
-            spawn_result = spawnenemy(world_map, GRID_SIZE)  # Get enemy spawn data
-            if spawn_result:
-                enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
-                enemy_present = True  # Enemy is now on the map
-            frame_counter = 0
+    if frame_counter >= SPAWN_INTERVAL and not enemy_present:
+        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y)  # Now using dynamic camera view
+        if spawn_result:
+            enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
+            enemy_present = True
+        frame_counter = 0
+    elif frame_counter >= 750 and enemy_present:
+        enemy_present = False
+        frame_counter = 0
+        redraw_needed = True
+        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y)
+        if spawn_result:
+            enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
+            enemy_present = True
+        frame_counter = 0
+
 
     
     # Only redraw if necessary
