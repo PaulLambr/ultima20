@@ -26,7 +26,7 @@ def britannia_castle():
     selected_item = None
     showbuysell = False
     
-    pygame.mixer.music.load("music/died.mp3")
+    pygame.mixer.music.load("music/castleu4.mp3")
     pygame.mixer.music.play(-1)  # Loops indefinitely
 
 

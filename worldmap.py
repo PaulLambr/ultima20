@@ -65,10 +65,10 @@ def getworldmap():
     for row in range(40,60):  # Top and bottom borders
         for col in range (40,60):
             world_map[row][col] = "water"
-    for row in range(48,53):  # Top and bottom borders
-        for col in range (48,53):
+    for row in range(43,56):  # Top and bottom borders
+        for col in range (43,57):
             world_map[row][col] = "grassland"
-    for row in range(61,99):  # Top and bottom borders
+    for row in range(60,99):  # Top and bottom borders
         for col in range (48,50):
             world_map[row][col] = "water"
     
