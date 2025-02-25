@@ -21,12 +21,16 @@ def getworldmap():
         world_map[1][col] = "hills"
         world_map[2][col] = "hills"
         world_map[3][col] = "hills"
+        world_map[4][col] = "hills"
+        world_map[5][col] = "hills"
         
     for row in range(WORLD_SIZE):  # Left and right borders
         world_map[row][0] = "rock"
         world_map[row][1] = "hills"
         world_map[row][2] = "hills"
         world_map[row][3] = "hills"
+        world_map[row][4] = "hills"
+        world_map[row][5] = "hills"
         world_map[row][99] = "rock"
 
     # Borders of the world made of rocks

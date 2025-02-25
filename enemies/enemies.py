@@ -32,11 +32,16 @@ class Enemies:
 ENEMIES_LIST = {
     "orc": Enemies("sprites/orc.png", 15, 3, 10, "grassland", "O", 20),
     "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 30),
-    "trollboss": Enemies("sprites/troll.png", 40, 8, 50, None, None, 75)
+    "trollboss": Enemies("sprites/troll.png", 45, 10, 50, None, None, 75),
+    "ettin": Enemies("sprites/ettin.png", 33, 8, 22, None, None, 75)
 }
 
 
-def spawnenemy(world_map, grid_size, camera_x, camera_y):
+def spawnenemy(world_map, grid_size, camera_x, camera_y, player_x, player_y):
+    zone1, zone2 = True, False
+    if player_x >30 or player_y >30:
+        zone1, zone2 = False, True
+        
     spawnable_tiles = []  # List to store potential spawn locations
 
     # Iterate over the visible area defined by the camera
@@ -53,8 +58,10 @@ def spawnenemy(world_map, grid_size, camera_x, camera_y):
     enemy_y, enemy_x, tile_type = random.choice(spawnable_tiles)
 
     # Determine which enemy to spawn
-    if tile_type == "grassland":
+    if tile_type == "grassland" and zone1:
         enemy_type = "orc"
+    elif tile_type == "grassland" and zone2:
+        enemy_type = "ettin"
     elif tile_type == "hills":
         enemy_type = "troll"
 

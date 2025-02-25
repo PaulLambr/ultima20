@@ -238,7 +238,7 @@ while running:
         # Spawn enemy every SPAWN_INTERVAL frames
         frame_counter += 1
     if frame_counter >= SPAWN_INTERVAL and not enemy_present:
-        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y)  # Now using dynamic camera view
+        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y, player_x, player_y)  # Now using dynamic camera view
         if spawn_result:
             enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
             enemy_present = True
@@ -247,7 +247,7 @@ while running:
         enemy_present = False
         frame_counter = 0
         redraw_needed = True
-        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y)
+        spawn_result = spawnenemy(world_map, grid_size, camera_x, camera_y, player_x, player_y)
         if spawn_result:
             enemy_x, enemy_y, enemy_sprite, enemy_type = spawn_result
             enemy_present = True
