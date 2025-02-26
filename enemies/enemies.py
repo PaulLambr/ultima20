@@ -33,7 +33,7 @@ ENEMIES_LIST = {
     "orc": Enemies("sprites/orc.png", 15, 3, 10, "grassland", "O", 20),
     "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 30),
     "trollboss": Enemies("sprites/troll.png", 45, 10, 50, None, None, 75),
-    "ettin": Enemies("sprites/ettin.png", 33, 8, 22, None, None, 75)
+    "ettin": Enemies("sprites/ettin.png", 33, 8, 22, None, None, 50)
 }
 
 
