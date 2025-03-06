@@ -364,6 +364,7 @@ def attack(player_x, player_y, direction, enemy_list, bosstrspawnf, screen):
                     bosstrspawnf = damage(i, enemy_list, bosstrspawnf)  # ✅ Apply damage
                     draw_hit_marker(screen, attack_x, attack_y, color=(255, 0, 0))  # ✅ Red dot for hit
                 else:
+                    print("You missed.")
                     draw_hit_marker(screen, attack_x, attack_y, color=(128, 128, 128))  # ✅ Grey dot for miss
                 return bosstrspawnf  # Exit after attacking the first enemy in range
 
@@ -375,7 +376,7 @@ def draw_hit_marker(screen, tile_x, tile_y, color):
     """
     Draws a small hit marker (dot) on the specified tile.
     """
-    marker_size = TILE_SIZE // 4  # Small dot size
+    marker_size = TILE_SIZE // 2  # Small dot size
     marker_x = (tile_x * TILE_SIZE) + (TILE_SIZE // 2) - (marker_size // 2)
     marker_y = (tile_y * TILE_SIZE) + (TILE_SIZE // 2) - (marker_size // 2)
 
