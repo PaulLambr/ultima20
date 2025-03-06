@@ -7,7 +7,7 @@ pygame.init()  # 🔥 This must run before creating fonts in UI
 
 class MerchantWares:
     def __init__(
-        self, availability, purchvalue, sellvalue, damage, protection, healpower, item_name, isweapon, isarmor, cansell
+        self, availability, purchvalue, sellvalue, damage, protection, healpower, item_name, isweapon, isarmor, cansell, isprojectile, range
     ):
         self.availability = availability
         self.purchvalue = purchvalue
@@ -19,6 +19,8 @@ class MerchantWares:
         self.isweapon = isweapon
         self.isarmor = isarmor
         self.cansell = cansell
+        self.isprojectile = isprojectile
+        self.range = range
 
     @staticmethod
     def showwares():
@@ -48,11 +50,16 @@ class MerchantWares:
 
 
 # ✅ Define `MERCHANT_WARES` as a global dictionary
+#self, availability, purchvalue, sellvalue, damage, protection, healpower, item_name, isweapon, isarmor, cansell, isprojectile
+  
 MERCHANT_WARES = {
-    "vorpal blade": MerchantWares("all", 100, 50, 5, None, None, "Vorpal Blade", True, False, True),
-    "morningstar": MerchantWares("all", 250, 125, 8, None, None, "Morningstar", True, False, True),
-    "leather armor": MerchantWares("all", 200, 100, None, .8, None, "Leather Armor", False, True, True),
-    "hauberk": MerchantWares("all", 500, 250, None, .6, None, "Hauberk", False, True, True),
-    "healing salve": MerchantWares("all", 30, None, None, None, 25, "Healing Salve", False, False, False),
-    "holy ruby": MerchantWares(None, 30, None, None, None, None, "Holy Ruby", False, False, False),
+    "vorpal blade": MerchantWares("all", 100, 50, 5, None, None, "Vorpal Blade", True, False, True, False,1),
+    "morningstar": MerchantWares("all", 250, 125, 8, None, None, "Morningstar", True, False, True, False,2),
+    "alder bow": MerchantWares("all", 275, 138, 3, None, None, "Alder Bow", True, False, True, True,8),
+    "leather armor": MerchantWares("all", 200, 100, None, .8, None, "Leather Armor", False, True, True, False, None),
+    "hauberk": MerchantWares("all", 500, 250, None, .6, None, "Hauberk", False, True, True, False, None),
+    "healing salve": MerchantWares("all", 30, None, None, None, 25, "Healing Salve", False, False, False, False,None),
+    "holy ruby": MerchantWares(None, 30, None, None, None, None, "Holy Ruby", False, False, False, False,None),
+  
+    
 }

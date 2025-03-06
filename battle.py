@@ -109,7 +109,7 @@ def combat(player_level, tile_type, enemy_type, winning, bosstrspawnf):
                 ):  # If "A" was pressed, register the next key as attack direction
                     pending_attack = event.key
                     attack_mode = False
-                    attack(player_x, player_y, pending_attack, enemy_list, bosstrspawnf)
+                    attack(player_x, player_y, pending_attack, enemy_list, bosstrspawnf, screen)
 
                     # ✅ Trigger adjacency check after an attack
                     new_enemy_list = []
@@ -328,27 +328,59 @@ def move_enemy_battle(
     return enemy_x, enemy_y  # Stay in place if blocked
 
 
-def attack(player_x, player_y, direction, enemy_list, bosstrspawnf):  # ✅ Add bosstrspawnf
+def attack(player_x, player_y, direction, enemy_list, bosstrspawnf, screen):  
     """
     Processes an attack when 'A' is pressed followed by a direction key.
     """
     attack_x, attack_y = player_x, player_y
 
-    if direction == pygame.K_LEFT:
-        attack_x -= 1
-    elif direction == pygame.K_RIGHT:
-        attack_x += 1
-    elif direction == pygame.K_UP:
-        attack_y -= 1
-    elif direction == pygame.K_DOWN:
-        attack_y += 1
+    # Get the player's weapon properties
+    weapon_key = player.weapon.lower()
+    weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)
 
-    for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
-        if attack_x == ex and attack_y == ey:
-            bosstrspawnf = damage(i, enemy_list, bosstrspawnf)  # ✅ Pass and receive bosstrspawnf
-            return bosstrspawnf  # ✅ Ensure updated value is returned
+    if not weapon_data:
+        print("No valid weapon equipped.")
+        return bosstrspawnf  # Exit early if no weapon found
 
-    return bosstrspawnf  # If no enemy was hit, return unchanged
+    weapon_range = weapon_data.range  # Get weapon range
+    hit_chance = max(0.3 - (player.level * 0.02), 0.05)  # Reduce miss chance per level, min 5%
+    attack_successful = random.random() > hit_chance  # Determine if attack hits
+
+    # Determine attack range along the given direction
+    for _ in range(weapon_range):
+        if direction == pygame.K_LEFT:
+            attack_x -= 1
+        elif direction == pygame.K_RIGHT:
+            attack_x += 1
+        elif direction == pygame.K_UP:
+            attack_y -= 1
+        elif direction == pygame.K_DOWN:
+            attack_y += 1
+
+        # Check for enemy at the attack location
+        for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
+            if attack_x == ex and attack_y == ey:
+                if attack_successful:
+                    bosstrspawnf = damage(i, enemy_list, bosstrspawnf)  # ✅ Apply damage
+                    draw_hit_marker(screen, attack_x, attack_y, color=(255, 0, 0))  # ✅ Red dot for hit
+                else:
+                    draw_hit_marker(screen, attack_x, attack_y, color=(128, 128, 128))  # ✅ Grey dot for miss
+                return bosstrspawnf  # Exit after attacking the first enemy in range
+
+    # If no enemy was hit, overlay a grey dot on the final attack tile
+    draw_hit_marker(screen, attack_x, attack_y, color=(128, 128, 128))  # ✅ Grey dot for miss
+    return bosstrspawnf  # Ensure the function always returns the updated value
+
+def draw_hit_marker(screen, tile_x, tile_y, color):
+    """
+    Draws a small hit marker (dot) on the specified tile.
+    """
+    marker_size = TILE_SIZE // 4  # Small dot size
+    marker_x = (tile_x * TILE_SIZE) + (TILE_SIZE // 2) - (marker_size // 2)
+    marker_y = (tile_y * TILE_SIZE) + (TILE_SIZE // 2) - (marker_size // 2)
+
+    pygame.draw.circle(screen, color, (marker_x, marker_y), marker_size)
+    pygame.display.update()  # Refresh screen to show marker immediately
 
 
 
