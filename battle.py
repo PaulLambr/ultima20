@@ -332,19 +332,21 @@ def attack(player_x, player_y, direction, enemy_list, bosstrspawnf, screen):
     """
     Processes an attack when 'A' is pressed followed by a direction key.
     """
+    attack_successful = False
     attack_x, attack_y = player_x, player_y
 
     # Get the player's weapon properties
     weapon_key = player.weapon.lower()
     weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)
 
-    if not weapon_data:
-        print("No valid weapon equipped.")
-        return bosstrspawnf  # Exit early if no weapon found
+    fist_range = 1  # ✅ Fists only hit adjacent tiles
 
-    weapon_range = weapon_data.range  # Get weapon range
-    hit_chance = max(0.3 - (player.level * 0.02), 0.05)  # Reduce miss chance per level, min 5%
-    attack_successful = random.random() > hit_chance  # Determine if attack hits
+    weapon_range = weapon_data.range if weapon_data else fist_range
+    hit_chance = random.randint(1,10) + player.level
+    if hit_chance >3:
+        attack_successful = True
+
+    is_fist_attack = weapon_data is None  # ✅ True if no weapon equipped
 
     # Determine attack range along the given direction
     for _ in range(weapon_range):
@@ -361,7 +363,7 @@ def attack(player_x, player_y, direction, enemy_list, bosstrspawnf, screen):
         for i, (ex, ey, et, es, hp) in enumerate(enemy_list):
             if attack_x == ex and attack_y == ey:
                 if attack_successful:
-                    bosstrspawnf = damage(i, enemy_list, bosstrspawnf)  # ✅ Apply damage
+                    bosstrspawnf = damage(i, enemy_list, bosstrspawnf, is_fist_attack)  # ✅ Pass is_fist_attack
                     draw_hit_marker(screen, attack_x, attack_y, color=(255, 0, 0))  # ✅ Red dot for hit
                 else:
                     print("You missed.")
@@ -385,7 +387,7 @@ def draw_hit_marker(screen, tile_x, tile_y, color):
 
 
 
-def damage(enemy_index, enemy_list, bosstrspawnf):  # ✅ Add bosstrspawnf as an argument
+def damage(enemy_index, enemy_list, bosstrspawnf, is_fist_attack):  # ✅ Add bosstrspawnf as an argument
     """
     Reduces enemy hitpoints and removes the enemy if they are defeated.
     """
@@ -393,7 +395,7 @@ def damage(enemy_index, enemy_list, bosstrspawnf):  # ✅ Add bosstrspawnf as an
     weapon_data = merchantwares.MERCHANT_WARES.get(weapon_key, None)
     weaponcoeff = weapon_data.damage if weapon_data else 0
 
-    enemy_damage = random.uniform(1, 2) * (player.strength + weaponcoeff)
+    enemy_damage = random.uniform(.5, 1.5) * (player.strength + weaponcoeff)
     enemy_list[enemy_index][4] -= enemy_damage
     print(f"\n You scored {enemy_damage} points against {enemy_list[enemy_index][4]} enemy hp.")
 

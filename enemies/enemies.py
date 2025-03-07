@@ -29,11 +29,13 @@ class Enemies:
 
 
 # Dictionary to store enemy types
+#(self, sprite_path, hitpoints, strength, loot, spawn, lettersprite, xp)
+
 ENEMIES_LIST = {
-    "orc": Enemies("sprites/orc.png", 15, 3, 10, "grassland", "O", 20),
-    "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 30),
-    "trollboss": Enemies("sprites/troll.png", 45, 10, 50, None, None, 75),
-    "ettin": Enemies("sprites/ettin.png", 33, 8, 22, None, None, 50)
+    "orc": Enemies("sprites/orc.png", 12, 3, 10, "grassland", "O", 12),
+    "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 25),
+    "trollboss": Enemies("sprites/troll.png", 60, 12, 50, None, None, 60),
+    "ettin": Enemies("sprites/ettin.png", 35, 9, 22, "grassland", None, 40)
 }
 
 

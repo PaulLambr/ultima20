@@ -240,7 +240,7 @@ class UI:
 class Dialog:
     def __init__(self):
         self.WIDTH = 800
-        self.HEIGHT = 200
+        self.HEIGHT = 250
         self.BACKGROUND_COLOR = (50, 50, 50)
         self.TEXT_COLOR = (255, 255, 255)
         self.font = pygame.font.Font(None, 30)

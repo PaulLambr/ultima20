@@ -32,29 +32,29 @@ class PlayerStats:
 
     def levelup(self, bosstrspawnf):
         global level1done, level2done, level3done, level4done
-        if self.xp >= 125 and level1done == False:  # Level up when XP reaches 100
+        if self.xp >= 100 and level1done == False:  # Level up when XP reaches 100
             self.level += 1
             self.maxhp += random.randint(5, 10)  # Increase HP
             self.hitpoints = self.maxhp
-            self.strength += random.randint(1, 2)  # Increase Strength
+            self.strength += random.randint(1, 3)  # Increase Strength
             ui_panel.update_stats(player)
             level1done = True
         elif (
-            self.xp >= 450 and level1done == True and level2done == False
+            self.xp >= 350 and level1done == True and level2done == False
         ):  # Level up when XP reaches 100
             self.level += 1
             self.maxhp += random.randint(10, 20)  # Increase HP
             self.hitpoints = self.maxhp
-            self.strength += random.randint(2, 3)  # Increase Strength
+            self.strength += random.randint(2, 4)  # Increase Strength
             ui_panel.update_stats(player)
             level2done = True
         elif (
-            self.xp >= 900 and level1done and level2done and not level3done
+            self.xp >= 800 and level1done and level2done and not level3done
         ):  # Level up when XP reaches 100
             self.level += 1
             self.maxhp += random.randint(20, 30)  # Increase HP
             self.hitpoints = self.maxhp
-            self.strength += random.randint(2, 4)  # Increase Strength
+            self.strength += random.randint(3, 4)  # Increase Strength
             ui_panel.update_stats(player)
             level3done = True
             
@@ -64,7 +64,7 @@ class PlayerStats:
             self.level += 1
             self.maxhp += random.randint(25, 35)  # Increase HP
             self.hitpoints = self.maxhp
-            self.strength += random.randint(3, 6)  # Increase Strength
+            self.strength += random.randint(3, 5)  # Increase Strength
             ui_panel.update_stats(player)
             level4done = True
             
@@ -72,14 +72,14 @@ class PlayerStats:
         return bosstrspawnf
 
 # Initialize Player Stats
-initial_hp=random.randint(25, 35)
+initial_hp=random.randint(30, 40)
 
 player = PlayerStats(
     level=1,
     hitpoints=initial_hp,
     maxhp=initial_hp,
     strength=random.randint(5, 10),
-    gold=500,
+    gold=0,
     xp=0,
     weapon="Fists",
     armor="Furs",
