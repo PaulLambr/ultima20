@@ -135,6 +135,7 @@ def britannia_castle():
 
                     if new_x == 8 and new_y == 11:
                         print("Returning to the overworld...")
+                        pygame.mixer.music.stop()
                         return
 
             if event.type == pygame.MOUSEBUTTONDOWN:

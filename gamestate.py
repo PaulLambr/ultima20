@@ -8,6 +8,7 @@ level1done = False
 level2done = False
 level3done = False
 level4done = False
+level5done = False
 
 
 class PlayerStats:
@@ -31,8 +32,11 @@ class PlayerStats:
         
 
     def levelup(self, bosstrspawnf):
-        global level1done, level2done, level3done, level4done
+        pygame.mixer.init()
+        global level1done, level2done, level3done, level4done, level5done
         if self.xp >= 100 and level1done == False:  # Level up when XP reaches 100
+            pygame.mixer.music.load("music/levelup.mp3")
+            pygame.mixer.music.play()  
             self.level += 1
             self.maxhp += random.randint(5, 10)  # Increase HP
             self.hitpoints = self.maxhp
@@ -42,6 +46,8 @@ class PlayerStats:
         elif (
             self.xp >= 350 and level1done == True and level2done == False
         ):  # Level up when XP reaches 100
+            pygame.mixer.music.load("music/levelup.mp3")
+            pygame.mixer.music.play()  
             self.level += 1
             self.maxhp += random.randint(10, 20)  # Increase HP
             self.hitpoints = self.maxhp
@@ -51,6 +57,8 @@ class PlayerStats:
         elif (
             self.xp >= 800 and level1done and level2done and not level3done
         ):  # Level up when XP reaches 100
+            pygame.mixer.music.load("music/levelup.mp3")
+            pygame.mixer.music.play()  
             self.level += 1
             self.maxhp += random.randint(20, 30)  # Increase HP
             self.hitpoints = self.maxhp
@@ -61,14 +69,26 @@ class PlayerStats:
         elif (
             self.xp >= 1500 and level1done and level2done and level3done and not level4done
         ):  # Level up when XP reaches 100
+            pygame.mixer.music.load("music/levelup.mp3")
+            pygame.mixer.music.play()  
             self.level += 1
             self.maxhp += random.randint(25, 35)  # Increase HP
             self.hitpoints = self.maxhp
             self.strength += random.randint(3, 5)  # Increase Strength
             ui_panel.update_stats(player)
             level4done = True
-            
-            
+          
+        elif (    
+            self.xp >= 2500 and level1done and level2done and level3done and level4done and not level5done
+        ):  # Level up when XP reaches 100
+            pygame.mixer.music.load("music/levelup.mp3")
+            pygame.mixer.music.play()  
+            self.level += 1
+            self.maxhp += random.randint(35, 50)  # Increase HP
+            self.hitpoints = self.maxhp
+            self.strength += random.randint(4, 6)  # Increase Strength
+            ui_panel.update_stats(player)
+            level5done = True
         return bosstrspawnf
 
 # Initialize Player Stats
