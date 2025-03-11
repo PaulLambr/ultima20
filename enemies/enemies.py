@@ -34,7 +34,7 @@ class Enemies:
 ENEMIES_LIST = {
     "orc": Enemies("sprites/orc.png", 12, 3, 10, "grassland", "O", 12),
     "troll": Enemies("sprites/troll.png", 25, 6, 15, "hills", "T", 25),
-    "trollboss": Enemies("sprites/troll.png", 50, 10, 50, None, None, 60),
+    "trollboss": Enemies("sprites/troll.png", 60, 12, 52, None, None, 62),
     "ettin": Enemies("sprites/ettin.png", 35, 9, 22, "grassland", None, 40)
 }
 
